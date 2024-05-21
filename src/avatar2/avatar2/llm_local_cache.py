@@ -26,18 +26,18 @@ class LocalCache():
         })
         
         if filename:
-            self._load_cache(filename)
+            self._load_cache_fom_file(filename)
             
-    def _load_cache_fom_file(self, filename):
+    def _load_cache_fom_file(self, filename) -> None:
         if os.path.exists(filename):
             try:
                 with open(filename, 'r') as f:
                     data = json.load(f)
                     for key, value in data.items():
                         self._cache[key] = value
-                    self.getlogger().info(f"{self._node.get_name()} Loaded cache entries from {filename} with {len(data)} entries")
+                    self._node.get_logger().info(f"{self._node.get_name()} Loaded cache entries from {filename} with {len(data)} entries")
             except Exception as e:
-                self._node.error(f"{self._node.get_name()} Error loading cache from {filename}: {e}")
+                self._node.get_logger().info(f"{self._node.get_name()} Error loading cache from {filename}: {e}")
         else:
             self._node.get_logger().info(f"{self._node.get_name()} No cache file found at {filename}")
     
