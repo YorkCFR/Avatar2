@@ -39,9 +39,12 @@ class LLMEngine(Node):
 
             self.declare_parameter('format', '\n###USER: {question}\n###ASSISTANT:')
             format = self.get_parameter('format').get_parameter_value().string_value
+            
+            self.declare_parameter('test_cache', 'test_cache.json')
+            test_cache = root + self.get_parameter('test_cache').get_parameter_value().string_value
 
             self._llm = LLMLangChain(model=model, prompt=prompt, vectorstore=vectorstore, format=format)
-            self._local_cache = LocalCache(node=self)
+            self.local_cache = LocalCache(node=self, filename=test_cache)
         elif avatar_type == 'faces':
             self.declare_parameter('root', './museum/')
             root = self.get_parameter('root').get_parameter_value().string_value
@@ -57,9 +60,12 @@ class LLMEngine(Node):
 
             self.declare_parameter('format', '\n###USER: {question}\n###ASSISTANT:')
             format = self.get_parameter('format').get_parameter_value().string_value
+            
+            self.declare_parameter('test_cache', 'test_cache.json')
+            test_cache = root + self.get_parameter('test_cache').get_parameter_value().string_value
 
             self._llm = LLMWithFaces(model=model, prompt=prompt, vectorstore=vectorstore, format=format, node=self)
-            self._local_cache = LocalCache(node=self)
+            self.local_cache = LocalCache(node=self, filename=test_cache)
         else:
             self.get_logger().info(f'{self.get_name()} {avatar_type} not known, using dummy')
             self._llm = LLMDummy()
@@ -71,15 +77,20 @@ class LLMEngine(Node):
         """Deal with translation"""
         self.get_logger().info(f"{self.get_name()} listening got {msg.text.data}")
         self.get_logger().info(f"{self.get_name()} checking cache for {msg.text.data}")
-        response = self._local_cache._process_query(msg.text.data)
+        response, response_time = self.local_cache.query_cache(msg.text.data)
         
         if response is None:
             self.get_logger().info(f"{self.get_name()} cache miss for {msg.text.data}")
+            start_time = self.get_clock().now()
             prompt, response = self._llm.response(text=msg.text.data)
-            self.get_logger().info(f"{self.get_name()} response: {response}")
-        self.get_logger().info(f"{self.get_name()} updating cache for {msg.text.data}")
-        self._local_cache._update_cache(msg.text.data, response)
-        
+            time_taken = self.get_clock().now() - start_time
+            # Add to cache
+            self.local_cache.add_to_cache(msg.text.data, response, time_taken)
+            self.get_logger().info(f"{self.get_name()} response: {response}, {len(response)}")
+        else:
+            # Cache hit - no need to add to cache
+            self.get_logger().info(f"{self.get_name()} cache hit for {msg.text.data}, response time {response_time}")
+            
         tagged_string = TaggedString()
         tagged_string.header.stamp = self.get_clock().now().to_msg()
         tagged_string.audio_sequence_number = msg.audio_sequence_number

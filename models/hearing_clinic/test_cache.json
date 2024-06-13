@@ -1,0 +1,11 @@
+{
+    "hi": ["Hi! How can I help you today?", 0],
+    "hello": ["Hi there! How can I assist you today?", 0],
+    "goodbye": ["Goodbye!", 0],
+    "how are you": ["Hi! I'm doing well today. How can I assist you?", 0],
+    "what is your name": ["My name is Mary. How can I assist you today?", 0],
+    "good morning": ["Good morning! How can I assist you today?", 0],
+    "good afternoon": ["Good afternoon! How can I assist you today?", 0],
+    "good evening": ["Good evening! How can I assist you today?", 0],
+    "good night": ["Good night! How can I assist you today?", 0]
+}
