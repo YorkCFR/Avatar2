@@ -14,7 +14,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
     root = "/home/walleed/Avatar_2/models/hearing_clinic/"  # NB: need trailing slash
     model = "WizardLM-7B-uncensored.Q4_K_M.gguf"
-    format = "\n### USER: {question}\n### ASSISTANT:"
+    format = "\n### Input: {question}\n### Response:"
     vectorstore = "hearing.pkl"
     test_cache = "test_cache.json"
 

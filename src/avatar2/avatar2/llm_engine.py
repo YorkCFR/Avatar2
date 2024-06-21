@@ -77,19 +77,18 @@ class LLMEngine(Node):
         """Deal with translation"""
         self.get_logger().info(f"{self.get_name()} listening got {msg.text.data}")
         self.get_logger().info(f"{self.get_name()} checking cache for {msg.text.data}")
-        response, response_time = self.local_cache.query_cache(msg.text.data)
+        response, response_time = self.local_cache.get(msg.text.data)
         
         if response is None:
-            self.get_logger().info(f"{self.get_name()} cache miss for {msg.text.data}")
             start_time = self.get_clock().now()
             prompt, response = self._llm.response(text=msg.text.data)
-            time_taken = self.get_clock().now() - start_time
+            time_taken = (self.get_clock().now() - start_time).nanoseconds / 1e9
             # Add to cache
-            self.local_cache.add_to_cache(msg.text.data, response, time_taken)
+            self.local_cache.put(msg.text.data, response, time_taken)
             self.get_logger().info(f"{self.get_name()} response: {response}, {len(response)}")
         else:
-            # Cache hit - no need to add to cache
-            self.get_logger().info(f"{self.get_name()} cache hit for {msg.text.data}, response time {response_time}")
+            # Cache hit so update the cache with the response time
+            self.local_cache.put(msg.text.data, response, response_time)
             
         tagged_string = TaggedString()
         tagged_string.header.stamp = self.get_clock().now().to_msg()
