@@ -10,6 +10,12 @@ import os
 class Audio2TextNode(Node):
     def __init__(self):
         super().__init__('audio_2_text_node')
+        
+        # debug param
+        self.declare_parameter('debug', False)
+        self._debug = self.get_parameter('debug').get_parameter_value().bool_value
+        self.get_logger().info(f'{self.get_name()} node created, debug is {self._debug}')
+
         self.declare_parameter('topic', '/avatar2/in_raw_audio')
         topic = self.get_parameter('topic').get_parameter_value().string_value
         self.declare_parameter('message', '/avatar2/in_message')
@@ -29,11 +35,13 @@ class Audio2TextNode(Node):
         self.create_service(Listen, self._listen, self._listener_callback)
         self._listening = True
         self._listening_time = self.get_clock().now().nanoseconds
-        self.get_logger().info(f"{self.get_name()} Time {self._listening_time}")
+        if self._debug:
+            self.get_logger().info(f"{self.get_name()} Time {self._listening_time}")
 
     def _listener_callback(self, msg, resp):
         """Deal with service call to set listening status"""
-        self.get_logger().info(f"{self.get_name()} Setting listening status to {msg.listen}")
+        if self._debug:
+            self.get_logger().info(f"{self.get_name()} Setting listening status to {msg.listen}")
         if msg.listen:
             self._listening_time = self.get_clock().now().nanoseconds
         self._listening = msg.listen
@@ -49,9 +57,11 @@ class Audio2TextNode(Node):
         os.remove(path)
 
         if (not self._listening) or (self.get_clock().now().nanoseconds < self._listening_time + 4 * 1e9):
-            self.get_logger().info(f"{self.get_name()} Not listening to message sequence number {data.seq} |{result['text']}|")
+            if self._debug:
+                self.get_logger().info(f"{self.get_name()} Not listening to message sequence number {data.seq} |{result['text']}|")
             return
-        self.get_logger().info(f"{self.get_name()} Listening to message sequence number {data.seq} |{result['text']}|")
+        if self._debug:
+            self.get_logger().info(f"{self.get_name()} Listening to message sequence number {data.seq} |{result['text']}|")
         tagged_string = TaggedString()
         tagged_string.header.stamp = self.get_clock().now().to_msg()
         tagged_string.audio_sequence_number = data.seq

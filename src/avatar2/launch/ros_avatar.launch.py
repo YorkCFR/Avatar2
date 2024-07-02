@@ -9,12 +9,14 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     imagery = '/home/baranparsai/Documents/Avatar2/ros_avatar'   # default imagery location
-    for arg in sys.argv: # there must be a better way...
+    debug = False
+    for arg in sys.argv[4:]:
         if arg.startswith('imagery:='):
            print(arg.split('imagery:=', 1)[1])
            imagery = arg.split('imagery:=', 1)[1]
+
         elif ':=' in arg:
-           print(f"Unknown argument in {arg}. Usage ros2 launch ros_avatar.launch.py [imagery:=path_to_imagery]")
+           print(f"Unknown argument in {arg}. Usage ros2 launch ros_avatar.launch.py [imagery:=path_to_imagery] [debug:=False|True]")
            sys.exit(0)
     print(f"Launching ros_avatar.launch using imagery from {imagery}")
 
@@ -24,6 +26,6 @@ def generate_launch_description():
              executable='ros_avatar',
              name='ros_avatar',
              output='screen',
-             parameters=[{'imagery': imagery}]),
+             parameters=[{'imagery': imagery, 'debug': debug}]),
     ])
 

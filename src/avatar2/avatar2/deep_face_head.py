@@ -26,6 +26,11 @@ class YOLO_Pose(Node):
     def __init__(self):
         super().__init__('pose_node')
 
+        # debug param
+        self.declare_parameter('debug', False)
+        self._debug = self.get_parameter('debug').get_parameter_value().bool_value
+        self.get_logger().info(f'{self.get_name()} node created, debug is {self._debug}')
+
         # params
         self._model_file = os.path.join(get_package_share_directory('avatar2'), 'yolov8n-pose.pt') 
         self.declare_parameter("model", self._model_file) 
@@ -82,7 +87,8 @@ class YOLO_Pose(Node):
         )
 
         if len(results) != 1:
-            self.get_logger().info(f'{self.get_name()}  Nothing to see here or too much {len(results)}')
+            if self._debug:
+                self.get_logger().info(f'{self.get_name()}  Nothing to see here or too much {len(results)}')
             return
             
         results = results[0].cpu()

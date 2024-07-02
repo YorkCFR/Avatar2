@@ -20,6 +20,11 @@ class ProcessAudioNode(Node):
     def __init__(self):
         super().__init__('audio_source')
         self._msg_id = 0
+        # debug param
+        self.declare_parameter('debug', False)
+        self._debug = self.get_parameter('debug').get_parameter_value().bool_value
+        self.get_logger().info(f'{self.get_name()} node created, debug is {self._debug}')
+
         self.declare_parameter('topic', '/avatar2/in_raw_audio')
         self._topic = self.get_parameter('topic').get_parameter_value().string_value
         self.declare_parameter('threshold', "0")
@@ -34,7 +39,6 @@ class ProcessAudioNode(Node):
         self._non_speaking_duration = self.get_parameter('non_speaking_duration').get_parameter_value().double_value
         self.declare_parameter('sample_rate', 44100)
         self._sample_rate = self.get_parameter('sample_rate').get_parameter_value().integer_value
-        
         self._publisher = self.create_publisher(Audio, self._topic, QoSProfile(depth=1))
 
         self.recognizer = sr.Recognizer()
@@ -52,7 +56,8 @@ class ProcessAudioNode(Node):
 
         while rclpy.ok():
             with sr.Microphone(sample_rate=self._sample_rate) as source:
-                self.get_logger().info(f"Audio source waiting for input {self._phrase_time_limit}")
+                if self._debug:
+                    self.get_logger().info(f"Audio source waiting for input {self._phrase_time_limit}")
                 if self._phrase_time_limit > 0:
                     audio = self.recognizer.listen(source, phrase_time_limit=self._phrase_time_limit)
                 else:
@@ -65,7 +70,8 @@ class ProcessAudioNode(Node):
                 msg.seq = self._msg_id
                 self._msg_id = self._msg_id + 1
                 self._publisher.publish(msg)
-                self.get_logger().info(f"Audio source sent {len(msg.audio)} samples")
+                if self._debug:
+                    self.get_logger().info(f"Audio source sent {len(msg.audio)} samples")
 
 def main(args=None):
     rclpy.init(args=args)

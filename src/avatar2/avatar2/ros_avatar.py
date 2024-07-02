@@ -13,11 +13,18 @@ class ROSAvatar(Node):
         self.declare_parameter('topic', '/avatar2/out_raw_audio')
         self._topic = self.get_parameter('topic').get_parameter_value().string_value
 
+        #debug param    
+        self.declare_parameter('debug', False)
+        self._debug = self.get_parameter('debug').get_parameter_value().bool_value
+        self.get_logger().info(f'{self.get_name()} node created, debug is {self._debug}')
+
+
         self.declare_parameter('listen', '/avatar2/listen')
         self._listen = self.get_parameter('listen').get_parameter_value().string_value
         self._cli = self.create_client(Listen, self._listen)
         while not self._cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info(f'{self.get_name()} waiting for service {self._listen}')
+            if self._debug:
+                self.get_logger().info(f'{self.get_name()} waiting for service {self._listen}')
         self._req =  Listen.Request()
 
 
@@ -47,7 +54,8 @@ class ROSAvatar(Node):
     def _timer_callback(self):
         if self._play is not None:
             if not self._play.is_playing():
-                self.get_logger().info(f'{self.get_name()} sound is finished')
+                if self._debug:
+                    self.get_logger().info(f'{self.get_name()} sound is finished')
                 self._play = None
                 self._req.listen = True
                 self._cli.call_async(self._req)  # ignore return value
@@ -55,20 +63,23 @@ class ROSAvatar(Node):
         self._frameid = (self._frameid + 1) % self._nframes
         if self._play is None:
             cv2.imshow('Avatar', self._im_sleep[self._frameid])
-            self.get_logger().info(f'{self.get_name()} Not playing')
+            if self._debug:
+                self.get_logger().info(f'{self.get_name()} Not playing')
         else:
             t = time.time() - self._playtime
             alpha = 0.5 * (1 - math.cos(t * 2 * math.pi / 2))
             mix = cv2.addWeighted(self._im_talk[self._frameid], alpha, self._im_sleep[self._frameid], 1-alpha, 0)
             cv2.imshow('Avatar', mix)
-            self.get_logger().info(f'{self.get_name()} playing')
+            if self._debug:
+                self.get_logger().info(f'{self.get_name()} playing')
         cv2.waitKey(1)
 
 
     def _callback(self, data):
         if self._play is not None:
             if self._play.is_playing():
-                self.get_logger().info(f'{self.get_name()} currently playing, ignoring new sound')
+                if self._debug:
+                    self.get_logger().info(f'{self.get_name()} currently playing, ignoring new sound')
                 return  
         audio = bytes.fromhex(data.audio)
         if data.format == 'WAV_1_44100':
@@ -76,7 +87,8 @@ class ROSAvatar(Node):
         elif data.format == 'WAV_1_22050':
             sound = sa.WaveObject(audio, num_channels=1, bytes_per_sample=2, sample_rate=22050)
         else:
-            self.get_logger().info(f'{self.get_name()} got an unknown sound format {data.format}')
+            if self._debug:
+                self.get_logger().info(f'{self.get_name()} got an unknown sound format {data.format}')
             return
         self._req.listen = False
         self._cli.call_async(self._req)  # ignore return value

@@ -13,6 +13,12 @@ from .llm_local_cache import LocalCache
 class LLMEngine(Node):
     def __init__(self):
         super().__init__('llm_engine_node')
+        
+        # debug param
+        self.declare_parameter('debug', True)
+        self._debug = self.get_parameter('debug').get_parameter_value().bool_value
+        self.get_logger().info(f'{self.get_name()} node created, debug is {self._debug}')
+
         self.declare_parameter('out_topic', '/avatar2/out_message')
         outTopic = self.get_parameter('out_topic').get_parameter_value().string_value
         self.declare_parameter('in_topic', '/avatar2/in_message')
@@ -21,9 +27,12 @@ class LLMEngine(Node):
         self.declare_parameter('avatar', 'dummy')
         avatar_type = self.get_parameter('avatar').get_parameter_value().string_value
 
-        self.get_logger().info(f'{self.get_name()} Firing up an avatar of type {avatar_type}')
+        if self._debug:
+            self.get_logger().info(f'{self.get_name()} Firing up an avatar of type {avatar_type}')
+            
         if avatar_type == 'dummy':
             self._llm = LLMDummy()
+
         elif avatar_type == 'langchain':
             self.declare_parameter('root', './museum/')
             root = self.get_parameter('root').get_parameter_value().string_value
@@ -67,16 +76,20 @@ class LLMEngine(Node):
             self._llm = LLMWithFaces(model=model, prompt=prompt, vectorstore=vectorstore, format=format, node=self)
             self.local_cache = LocalCache(node=self, filename=test_cache)
         else:
-            self.get_logger().info(f'{self.get_name()} {avatar_type} not known, using dummy')
             self._llm = LLMDummy()
+            if self._debug:
+                self.get_logger().info(f'{self.get_name()} {avatar_type} not known, using dummy')
+
 
         self.create_subscription(TaggedString, inTopic, self._callback, QoSProfile(depth=1))
         self._publisher = self.create_publisher(TaggedString, outTopic, QoSProfile(depth=1))
     
     def _callback(self, msg):
         """Deal with translation"""
-        self.get_logger().info(f"{self.get_name()} listening got {msg.text.data}")
-        self.get_logger().info(f"{self.get_name()} checking cache for {msg.text.data}")
+        if self._debug:
+            self.get_logger().info(f"{self.get_name()} listening got {msg.text.data}")
+        if self._debug:
+            self.get_logger().info(f"{self.get_name()} checking cache for {msg.text.data}")
         response, response_time = self.local_cache.get(msg.text.data)
         
         if response is None:
@@ -85,7 +98,8 @@ class LLMEngine(Node):
             time_taken = (self.get_clock().now() - start_time).nanoseconds / 1e9
             # Add to cache
             self.local_cache.put(msg.text.data, response, time_taken)
-            self.get_logger().info(f"{self.get_name()} response: {response}, {len(response)}")
+            if self._debug:
+                self.get_logger().info(f"{self.get_name()} response: {response}, {len(response)}")
         else:
             # Cache hit so update the cache with the response time
             self.local_cache.put(msg.text.data, response, response_time)

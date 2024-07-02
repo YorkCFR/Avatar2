@@ -14,14 +14,19 @@ class FaceRecognizer:
     DEFAULT_ENCODINGS_PATH = Path(os.path.join("/home/baranparsai/Documents/Avatar2/scenarios/hearing_clinic/faces", "faces.pkl"))
     PEOPLE_INFO_PATH = Path(os.path.join("/home/baranparsai/Documents/Avatar2/scenarios/hearing_clinic/faces", "faces.json"))
     
-    def __init__(self, encodings=DEFAULT_ENCODINGS_PATH, database = PEOPLE_INFO_PATH):
+    def __init__(self, encodings=DEFAULT_ENCODINGS_PATH, database = PEOPLE_INFO_PATH, debug = False):
         self.people_info = []
         self._encodings_location = encodings
         self.load_encodings()
+        self._debug = debug
     
         with open(database) as f:
             self._database = json.load(f)
-        print(self._database)
+        self._print(self._database)
+
+    def _print(self,s):
+        if self._debug:
+            self._print(s)
 
     def load_encodings(self):
         """Load face encodings from a pickle file."""
@@ -108,13 +113,13 @@ class FaceRecognizer:
                 largest_face_area = face_area
                 largest_face_location = bounding_box
 
-        print(f"largest box is {largest_face_area}")
+        self._print(f"largest box is {largest_face_area}")
         id = -1
         name = {'name': 'unknown', 'ID': -1, 'role': 'unknown'}
 
         if largest_face_area > 0:
             id = self._recognize_face(unknown_encoding, self._loaded_encodings)
-            print(f"the id is {id}")
+            self._print(f"the id is {id}")
 
             if id >= 0:
                 name = self._database[id]
@@ -135,16 +140,16 @@ class FaceRecognizer:
         
         if votes:
             all_faces = Counter(loaded_encodings["names"])
-            print(f"all_faces {all_faces}")
+            self._print(f"all_faces {all_faces}")
             
             all_faces_l = list(all_faces)
-            print(f"all_faces_l {all_faces_l}")
+            self._print(f"all_faces_l {all_faces_l}")
 
             best_face = all_faces_l[0]
             best_count = -1
 
             for face in all_faces_l:
-                print(f"working out face {face} votes {votes[face]} total_faces {all_faces[face]} best_face {best_face}")
+                self._print(f"working out face {face} votes {votes[face]} total_faces {all_faces[face]} best_face {best_face}")
                 score = float(votes[face]) / float(all_faces[face])
 
                 if score > best_count:

@@ -16,7 +16,7 @@ import pickle
 
 class LLMWithFaces(LLM):
     _NO_FACE_RESET = 10.0
-    def __init__(self, model, prompt, format, vectorstore, node, max_vectors=2, n_ctx=2048, temperature=0, verbose=False, n_gpu_layers=-1):
+    def __init__(self, model, prompt, format, vectorstore, node, max_vectors=2, n_ctx=2048, temperature=0, verbose=False, n_gpu_layers=-1, debug = False):
         with open(vectorstore, "rb") as f:
             self.vectorstore = pickle.load(f)
         self._llm = LlamaCpp(model_path=model, temperature=temperature, n_ctx=n_ctx, verbose=verbose,  n_gpu_layers=n_gpu_layers)
@@ -24,6 +24,7 @@ class LLMWithFaces(LLM):
         self._format = format
         self._max_vectors = max_vectors
         self._node = node
+        self._debug = debug
         self._node.get_logger().info(f'{self._node.get_name()} LLMWithFaces alive')
 
         self._node.declare_parameter('face', "/avatar2/speaker_info")
@@ -45,7 +46,8 @@ class LLMWithFaces(LLM):
             else:
                 welcome = False
         self._last_face = self._node.get_clock().now()
-        self._node.get_logger().info(f'{self._node.get_name()} recovered face {msg.row} {msg.col} {welcome}')
+        if self._debug:
+            self._node.get_logger().info(f'{self._node.get_name()} recovered face {msg.row} {msg.col} {welcome}')
         face = self._bridge.imgmsg_to_cv2(msg.face, "bgr8")
 
 #        cv2.imshow('face', face)

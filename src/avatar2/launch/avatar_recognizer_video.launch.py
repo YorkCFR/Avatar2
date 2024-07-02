@@ -18,13 +18,18 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     root_dir = '/home/baranparsai/Documents/Avatar2/scenarios/hearing_clinic/faces'
-
+    debug = False
     for arg in sys.argv[4:]:
         if arg.startswith('root:='):
             print(f"Launching with face recognition database from {arg.split('root:=', 1)[1]}")
             root_dir = arg.split('root:=', 1)[1]
+
+        if arg.startswith('debug'):
+            print(f"Launching with debug is {arg.split('debug:=', 1)[1]}")
+            debug = bool(arg.split('debug:=', 1)[1])
+            
         else:
-            print("Usage: launch avatar2 avatar_recognizer_video.launch.py [root:=<face_recogntion_db>]")
+            print("Usage: launch avatar2 avatar_recognizer_video.launch.py [root:=<face_recogntion_db>] [debug:= False|True]")
             sys.exit()
 
 
@@ -41,6 +46,6 @@ def generate_launch_description():
              name='head_detect',
              output='screen',
              namespace="/avatar2",
-             parameters=[{'root_dir' : root_dir}])
+             parameters=[{'root_dir' : root_dir, 'debug': debug}])
     ])
 
