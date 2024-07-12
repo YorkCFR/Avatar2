@@ -7,13 +7,21 @@ from sensor_msgs.msg import Image
 
 class OpenCVCamera(Node):
 
-    def __init__(self, rostopic='/mycamera/image_raw'):
+    def __init__(self, rostopic='/mycamera/image_raw', port=2):
         super().__init__('avatar_camera')
 
+        self.declare_parameter('topic', rostopic)
+        rostopic = self.get_parameter('topic').get_parameter_value().string_value
+
+        self.declare_parameter('port', str(port))
+        port = self.get_parameter('port').get_parameter_value().integer_value
+
+        self.get_logger().info(f'{self.get_name()} publishing from camera {port} on {rostopic}')
+
         try:
-            self._camera =  cv2.VideoCapture(2, cv2.CAP_V4L2)
+            self._camera =  cv2.VideoCapture(port, cv2.CAP_V4L2)
         except Exception as e:
-            self.get_logger().error(f'Unable to open camera 2')
+            self.get_logger().error(f'{self.get_name()} Unable to open camera {port}')
             sys.exit(1)
 
         self._bridge = CvBridge()
@@ -29,7 +37,7 @@ class OpenCVCamera(Node):
 
                 rclpy.spin_once(self, timeout_sec=0)
         except Exception as e:
-            self.get_logger().error(f'CameraStreamNode capture error {e}')
+            self.get_logger().error(f'{self.get_name()} capture error {e}')
 
 def main(args=None):
     rclpy.init(args=args)

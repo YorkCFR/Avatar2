@@ -11,7 +11,7 @@ from .llm_withfaces import LLMWithFaces
 from .llm_local_cache import LocalCache
 
 class LLMEngine(Node):
-    def __init__(self, config_file='/home/baranparsai/Documents/Avatar2/hearing_clinic_config.json'):
+    def __init__(self, config_file='/home/walleed/Avatar2/hearing_clinic_config.json'):
         super().__init__('llm_engine_node')
 
         with open(config_file, 'r') as f:
@@ -39,16 +39,20 @@ class LLMEngine(Node):
             test_cache = root + '/' + config.get('test_cache', 'test_cache.json')
 
             if avatar_type == 'langchain':
+                self.get_logger().info(f'{self.get_name()} Loading LLM model {model}')
                 self._llm = LLMLangChain(model=model, prompt=prompt, vectorstore=vectorstore, format=format)
+                self.local_cache = LocalCache(node=self, filename=test_cache, root=root)
             if avatar_type == 'faces':
+                self.get_logger().info(f'{self.get_name()} Loading LLM model {model}')
                 self._llm = LLMWithFaces(model=model, prompt=prompt, vectorstore=vectorstore, format=format, node=self)
-            self.local_cache = LocalCache(node=self, filename=test_cache)
+            self.local_cache = LocalCache(node=self, filename=test_cache, root=root)
 
         else:
             if self._debug:
                 self.get_logger().info(f'{self.get_name()} {avatar_type} not known, using dummy')
             self._llm = LLMDummy()
 
+        self.get_logger().info(f"{self.get_name()} LLM {model} is active!")
         self.create_subscription(TaggedString, inTopic, self._callback, QoSProfile(depth=1))
         self._publisher = self.create_publisher(TaggedString, outTopic, QoSProfile(depth=1))
 
@@ -70,8 +74,8 @@ class LLMEngine(Node):
                 self.get_logger().info(f"{self.get_name()} response: {response}, {len(response)}")
         else:
             # Cache hit so update the cache with the response time
-            self.local_cache.put(msg.text.data, response, response_time)
-
+            self.local_cache._update_cache(msg.text.data, response, response_time)
+            
         tagged_string = TaggedString()
         tagged_string.header.stamp = self.get_clock().now().to_msg()
         tagged_string.audio_sequence_number = msg.audio_sequence_number

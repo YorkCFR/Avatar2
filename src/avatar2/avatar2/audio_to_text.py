@@ -55,7 +55,11 @@ class Audio2TextNode(Node):
             f.write(bytes.fromhex(data.audio))
         result = self._model.transcribe(path, fp16=False)
         os.remove(path)
-
+        if not result['text'].isascii():
+            self.get_logger().info(f"{self.get_name()} Non-ascii characters detected in the result")
+        # Replace the non-ascii characters with spaces
+        result['text'] = ''.join([char if char.isascii() else ' ' for char in result['text']])
+        
         if (not self._listening) or (self.get_clock().now().nanoseconds < self._listening_time + 4 * 1e9):
             if self._debug:
                 self.get_logger().info(f"{self.get_name()} Not listening to message sequence number {data.seq} |{result['text']}|")

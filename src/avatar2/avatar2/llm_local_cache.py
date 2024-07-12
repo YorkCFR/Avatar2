@@ -3,9 +3,11 @@ import json
 import time
 import heapq
 import string
+import datetime
+import rclpy.time
 
 class LocalCache():
-    def __init__(self, node, filename=None, max_size=100):
+    def __init__(self, node, filename=None, max_size=100, root=None):
         self._max_size = max_size
         self._node = node
         self.cache = []
@@ -18,6 +20,12 @@ class LocalCache():
         }
         self._node.get_logger().info(f"{self._node.get_name()} LocalCache alive!")
         
+        # Logging dir 
+        if root is not None:
+            self.logging_dir = root + '/logs/'
+        else:
+            self.logging_dir = "/home/walleed/Avatar2/scenarios/hearing_clinic/logs/"
+        
         if filename is not None:
             self._load_cache_fom_file(filename)
         self._initialize_permanent_entries()
@@ -28,7 +36,10 @@ class LocalCache():
                 if key_normalized not in self.cache_map:
                     # get the current time in seconds
                     timestamp = time.time()
-                    self.cache_map[key_normalized] = (f"Default response for {key_normalized}", timestamp, 0)
+                    input_time = self._node.get_clock().now().nanoseconds / 1e9 # Initialize the input time to the current time when loading the cache
+                    in_cache = True
+                    self.cache_map[key_normalized] = (f"Default response for {key_normalized}", timestamp, 0, input_time, in_cache)
+                    self._log_responses(key_normalized)
                     heapq.heappush(self.cache, (0, timestamp, key_normalized))
                 else:
                     self._node.get_logger().info(f"{self._node.get_name()} Key {key_normalized} already exists in the cache.")
@@ -39,10 +50,12 @@ class LocalCache():
             try:
                 with open(filename, 'r') as f:
                     data = json.load(f)
-                    for key, (value, timestamp, count) in data.items():
+                    for key, (value, timestamp, count, input_time, in_cache) in data.items():
                         key_normalized = key.lower().strip().translate(str.maketrans('', '', string.punctuation))
-                        self.cache_map[key_normalized] = (value, timestamp, count)
+                        input_time = self._node.get_clock().now().nanoseconds / 1e9 # Initialize the input time to the current time when loading the cache
+                        self.cache_map[key_normalized] = (value, timestamp, count, input_time, in_cache)
                         heapq.heappush(self.cache, (count, timestamp, key_normalized))
+                        self._log_responses(key_normalized)
                     self._node.get_logger().info(f"{self._node.get_name()} Loaded cache entries from {filename} with {len(data)} entries")
             except Exception as e:
                 self._node.get_logger().info(f"{self._node.get_name()} Error loading cache from {filename}: {e}")
@@ -50,20 +63,14 @@ class LocalCache():
             self._node.get_logger().info(f"{self._node.get_name()} No cache file found at {filename}, starting with an empty cache")
             
     def get(self, query):
-        start_time = self._node.get_clock().now()
+        start_time = self._node.get_clock().now().nanoseconds / 1e9
         # Check if the query is in the cache, if so return the response and response time and update the heap
         query_normalized = query.lower().strip().translate(str.maketrans('', '', string.punctuation))
         # Check if the query is in the cache
         if query_normalized in self.cache_map:
             self._node.get_logger().info(f"{self._node.get_name()} Cache hit for {query_normalized}")
-            response, timestamp, count = self.cache_map[query_normalized]
-            # Update the timestamp to the current time and increment count
-            new_timestamp = (self._node.get_clock().now() - start_time).nanoseconds / 1e9
-            new_count = count + 1
-            self.cache_map[query_normalized] = (response, new_timestamp, new_count)
-            # Update the heap with the new timestamp and count
-            self._node.get_logger().info(f"{self._node.get_name()} Updating cache for {query_normalized} with new timestamp {new_timestamp}")
-            heapq.heappush(self.cache, (new_count, new_timestamp, query_normalized))
+            response = self.cache_map[query_normalized][0]
+            new_timestamp = ((self._node.get_clock().now().nanoseconds / 1e9) - start_time)
             return response, new_timestamp
         else:
             self._node.get_logger().info(f"{self._node.get_name()} Cache miss for {query_normalized}")
@@ -71,23 +78,37 @@ class LocalCache():
         
     def put(self, query, response, response_time) -> None:
         query_normalized = query.lower().strip().translate(str.maketrans('', '', string.punctuation))
-        # If the query is already in the cache, update the value and timestamp
+        # If the query is already in the cache, update the value, count, timestamp and input time 
         response_time = float(response_time)
-        if query_normalized in self.cache_map:
-            self._node.get_logger().info(f"{self._node.get_name()} Updating cache for {query_normalized}")
-            _, old_timestamp, count = self.cache_map[query_normalized]
-            new_timestamp = response_time
-            new_count = count + 1
-            self._node.get_logger().info(f"{self._node.get_name()} Old timestamp: {old_timestamp}, New timestamp: {new_timestamp}")
-            self.cache_map[query_normalized] = (response, new_timestamp, new_count)
-            heapq.heappush(self.cache, (new_count, new_timestamp, query_normalized))
-        else:
-            self._node.get_logger().info(f"{self._node.get_name()} Adding to cache for {query_normalized}")
-            if len(self.cache) >= self._max_size:
-                self._evict_cache()
-            self.cache_map[query_normalized] = (response, response_time, 0)
-            self._node.get_logger().info(f"{self._node.get_name()} Added {query_normalized} to cache with response time {response_time}")
-            heapq.heappush(self.cache, (0, response_time, query_normalized))
+        # if query_normalized in self.cache_map:
+        #     self._update_cache(query_normalized, response, response_time)
+        # else:
+        new_input_time = self._node.get_clock().now().nanoseconds / 1e9
+        in_cache = False
+        count = 0
+        self._node.get_logger().info(f"{self._node.get_name()} Adding to cache for {query_normalized}")
+        if len(self.cache) >= self._max_size:
+            self._evict_cache()
+        self.cache_map[query_normalized] = (response, response_time, count, new_input_time, in_cache)
+        # Log the responses
+        self._log_responses(query_normalized)
+        self._node.get_logger().info(f"{self._node.get_name()} Added {query_normalized} to cache with response time {response_time}")
+        heapq.heappush(self.cache, (count, response_time, query_normalized))
+            
+    def _update_cache(self, query, response, response_time) -> None:
+        query_normalized = query.lower().strip().translate(str.maketrans('', '', string.punctuation))
+        new_input_time = self._node.get_clock().now().nanoseconds / 1e9
+        _, old_timestamp, count, input_time, in_cache = self.cache_map[query_normalized]
+        in_cache = True
+        new_count = count + 1
+        new_timestamp = response_time
+        self._node.get_logger().info(f"{self._node.get_name()} Old timestamp: {old_timestamp}, New timestamp: {new_timestamp}")
+        self._node.get_logger().info(f"{self._node.get_name()} Old count: {count}, New count: {new_count}")
+        self._node.get_logger().info(f"{self._node.get_name()} Old input time: {input_time}, New input time: {new_input_time}")
+        self.cache_map[query_normalized] = (response, new_timestamp, new_count, new_input_time, in_cache)
+        # Log the responses
+        self._log_responses(query_normalized)
+        heapq.heappush(self.cache, (new_count, new_timestamp, query))
         
     def _evict_cache(self):
         while self._heap:
@@ -100,7 +121,37 @@ class LocalCache():
     def save_cache_to_file(self, filename) -> None:
         try:
             with open(filename, 'w') as f:
-                json.dump({key: [value, timestamp, count] for key, (value, timestamp, count) in self.cache_map.items()}, f, indent=4)
+                json.dump({key: [value, timestamp, count, input_time, in_cache] for key, (value, timestamp, count, input_time, in_cache) in self.cache_map.items()}, f, indent=4)
                 self._node.get_logger().info(f"{self._node.get_name()} Saved cache to {filename}")
         except Exception as e:
             self._node.get_logger().info(f"{self._node.get_name()} Error saving cache to {filename}: {e}")
+            
+    def _log_responses(self, query) -> None:
+        if query in self.cache_map:
+            key = query
+            (value, timestamp, count, input_time, in_cache) = self.cache_map[query]
+            self._node.get_logger().info(f"{self._node.get_name()} Logging entry: {key} -> {value}, {timestamp}, {count}, {input_time}, {in_cache}")
+            # Get the entry time of the query
+            entry_time = input_time
+            # Get the timestamp of the query 
+            query_time = timestamp
+            # Get the count of the query
+            query_count = count
+            # Get the response of the query
+            query_response = value
+            
+            # Current time of logging
+            current_time = self._node.get_clock().now().nanoseconds / 1e9
+            # Get the time difference between the current time and the entry time
+            time_diff = current_time - entry_time
+            
+            # Log the query, response, timestamp, count, entry time, current time and time difference to a csv file
+            log_filename = self.logging_dir + datetime.datetime.fromtimestamp(current_time).strftime('%Y-%m-%d') + "_log.csv"
+            if os.path.exists(log_filename):
+                with open(log_filename, 'a') as f:
+                    f.write(f"{key}, {query_response}, {query_time}, {query_count}, {datetime.datetime.fromtimestamp(entry_time)}, {current_time}, {time_diff}, {in_cache} \n")
+            else:
+                with open(log_filename, 'w') as f:
+                    f.write("query, response, timestamp (time taken to generate/update the response), count, entry time, current time of logging, time difference\n")
+                    f.write(f"{key}, {query_response}, {query_time}, {query_count}, {entry_time}, {current_time}, {time_diff}, {in_cache}\n")
+            self._node.get_logger().info(f"Entry logged to {log_filename}")

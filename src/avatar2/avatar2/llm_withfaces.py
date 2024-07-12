@@ -16,7 +16,7 @@ import pickle
 
 class LLMWithFaces(LLM):
     _NO_FACE_RESET = 10.0
-    def __init__(self, model, prompt, format, vectorstore, node, max_vectors=2, n_ctx=2048, temperature=0, verbose=False, n_gpu_layers=-1, debug = False):
+    def __init__(self, model, prompt, format, vectorstore, node, max_vectors=2, n_ctx=2048, temperature=0, verbose=False, n_gpu_layers=26, debug = False):
         with open(vectorstore, "rb") as f:
             self.vectorstore = pickle.load(f)
         self._llm = LlamaCpp(model_path=model, temperature=temperature, n_ctx=n_ctx, verbose=verbose,  n_gpu_layers=n_gpu_layers)

@@ -3,10 +3,10 @@
     "out_topic": "/avatar2/out_message",
     "in_topic": "/avatar2/in_message",
     "avatar": "faces",
-    "root": "/home/baranparsai/Documents/Avatar2/scenarios/hearing_clinic",
-    "model": "WizardLM-7B-uncensored.Q4_K_M.gguf",
-    "prompt": "You are a helpful assistant at the Exquisite Hearing Clinic. If you don't know the answer, just say \"I'm not sure.\" Don't try to make up an answer. Your name is Mary. Use the following pieces of context to answer the user's question.",
+    "root": "/home/walleed/Avatar2/scenarios/hearing_clinic",
+    "model": "dolphin-2.7-mixtral-8x7b.Q4_K_M.gguf",
+    "prompt": "<|im_start|>SYSTEM You are a helpful assistant at the Exquisite Hearing Clinic. If you don't know the answer, just say \"I'm not sure.\" Don't try to make up an answer. Your name is Mary. Use the following pieces of context to answer the user's question.",
     "vectorstore": "hearing.pkl",
-    "format": "\n###USER: {question}\n###ASSISTANT:",
+    "format": "<|im_end|>\n<|im_start|>USER: {question}<|im_end|>\n<|im_start|>ASSISTANT:",
     "test_cache": "test_cache.json"
 }

@@ -2,67 +2,93 @@
     "hi": [
         "Hey there! How can I assist you today?",
         0.85744,
-        0
+        0,
+        0.0,
+        true
     ],
     "hello": [
         "Hi there! How can I assist you today?",
         0.65194,
-        0
+        0,
+        0.0,
+        true
     ],
     "what is your name": [
         "Mary, how may I assist you today?",
         0.55282,
-        0
+        0,
+        0.0,
+        true
     ],
     "how are you": [
         "Hi! I'm doing well today. How can I assist you?",
         657.31,
-        0
+        0,
+        0.0,
+        true
     ],
     "tell me some information about the clinic": [
         "Exquisite Hearing Clinic is located at 22 Richmond Street, Unit 101, in Richmond Hill, Ontario. The clinic is open from Monday to Friday at 9am till 5 pm. Evening and Weekend Appointments Available. Exquisite Hearing Clinic is dedicated to improving the lives of our community members who are hard of hearing. We understand how important your sense of hearing in life is as well as your overall health and happiness, which is why we are here and committed to providing an astounding experience for you.",
         2705.43,
-        0
+        0,
+        0.0,
+        true
     ],
     "what kind of services are available at the clinic": [
         "The Exquisite Hearing Clinic offers a wide range of hearing healthcare services, including complete hearing assessments, selection and fitting of hearing aids, aural rehabilitation, hearing aid repairs, adjustments and cleaning, as well as ear wax removal. They also provide custom ear protection and other assistive listening devices.",
         1470.36,
-        0
+        0,
+        0.0,
+        true
     ],
     "who is the owner of the clinic": [
         "The owner of the Exquisite Hearing Clinic is John Smith.",
         0.95053,
-        0
+        0,
+        0.0,
+        true
     ],
     "what can you tell me about penny": [
         "Penny is an experienced audiologist who has been teaching at an accredited Ontario College for the Hearing Instrument Specialist program since 2012. She dedicates her time to helping people with hearing disorders and enjoys every minute of it. Penny is also a hearing aid specialist at Exquisite Hearing Clinic in Richmond Hill, where she provides personalized care to her patients. Her expertise lies in reprogramming hearing aids to custom needs, as well as providing the latest technology and equipment to help individuals with hearing disorders.",
         1.68159,
-        0
+        0,
+        0.0,
+        true
     ],
     "what does cyanide taste like": [
         "It taste bitter and cyan.",
         0.61436,
-        0
+        0,
+        0.0,
+        true
     ],
     "how many different types of hairing aids are there": [
         "There are several types of hearing aids available, including in-the-ear (ITE), in-canal (IC), completely-in-the-canal (CIC), and behind-the-ear (BTE) aids. Each type has different features and benefits depending on the individual's needs and preferences.",
         1.34765,
-        0
+        0,
+        0.0,
+        true
     ],
     "what is the most common type of hearing aid": [
         "The most common type of hearing aid is the behind-the-ear (BTE) style, which typically consists of a small processor that sits behind the ear and a thin wire that connects it to the hearing aid. This style is often preferred because it is easy to insert and remove, and the processor can be easily customized by the hearing healthcare professional to fit the individual's specific needs.",
         1.44967,
-        0
+        0,
+        0.0,
+        true
     ],
     "what is the most expensive hearing aid": [
         "The most expensive hearing aid can range from $1000 to $5000 depending on the brand, style, and level of technology.",
         1.43093,
-        0
+        0,
+        0.0,
+        true
     ],
     "goodbye": [
         "Goodbye! Have a great day!",
         0.05264,
-        0
+        0,
+        0.0,
+        true
     ]
 
 }

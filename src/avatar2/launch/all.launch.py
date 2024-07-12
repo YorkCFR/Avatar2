@@ -89,14 +89,14 @@ def generate_launch_description():
             parameters=[{'root_dir' : root + '/faces', 'debug': debug}]) 
     nodes.append(face_recognizer_node)
         
-    llm_wizard_clinic_node = Node(
+    llm_dolphin_clinic_node = Node(
             package='avatar2',
             executable='llm_engine',
             name='llm_engine',
             output='screen',
             namespace="/avatar2",
             parameters=[{'config_file': config_file}])
-    nodes.append(llm_wizard_clinic_node)
+    nodes.append(llm_dolphin_clinic_node)
 
     if ros_ui:
         ros_node = Node(
