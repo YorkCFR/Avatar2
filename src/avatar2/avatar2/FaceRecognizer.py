@@ -11,8 +11,8 @@ import os
 # Date: 06/21
 
 class FaceRecognizer:
-    DEFAULT_ENCODINGS_PATH = Path(os.path.join("/home/baranparsai/Documents/Avatar2/scenarios/hearing_clinic/faces", "faces.pkl"))
-    PEOPLE_INFO_PATH = Path(os.path.join("/home/baranparsai/Documents/Avatar2/scenarios/hearing_clinic/faces", "faces.json"))
+    DEFAULT_ENCODINGS_PATH = "faces.pkl"
+    PEOPLE_INFO_PATH = "faces.json"
     
     def __init__(self, encodings=DEFAULT_ENCODINGS_PATH, database = PEOPLE_INFO_PATH, debug = True):
         self.people_info = []

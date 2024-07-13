@@ -23,31 +23,35 @@ from .FaceRecognizer import FaceRecognizer
 
 
 class Recognizer(Node):
-    DEFAULT_ROOT = "/home/baranparsai/Documents/Avatar2/scenarios/hearing_clinic/faces"
-    def __init__(self):
+    def __init__(self, config_file = 'config.json'):
         super().__init__('recognizer_node')
         self.get_logger().info(f'{self.get_name()} node created')
-
-
-        # params
-        self.declare_parameter('debug', False)
-        self._debug = self.get_parameter('debug').get_parameter_value().bool_value
-        self.get_logger().info(f'{self.get_name()} node created, debug is {self._debug}')
+        self.declare_parameter('config_file', config_file)
+        config_file = self.get_parameter('config_file').get_parameter_value().string_value
+        try:
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+        except:
+            self.get_logger().error(f'{self.get_name()} unable to open config_file {config_file}')
+            sys.exit(1)
+            
+        try:
+            self._debug = config['debug']
+            self._face_topic = config['face_topic']   
+            self._camera_topic = config['camera_topic']
+            root = config['root']
+            scenario = config['scenario']
+        
+        except:
+            self.get_logger().error(f'{self.get_name()} unable to get params from {config_file}')
+            sys.exit(1)
 
         self._msg_id = 0
-        self.declare_parameter('topic', '/avatar2/speaker_info')
-        self._topic = self.get_parameter('topic').get_parameter_value().string_value
-
-        self.declare_parameter("camera_topic", "/mycamera/image_raw")
-        self._camera_topic = self.get_parameter("camera_topic").get_parameter_value().string_value
-
-        self.declare_parameter("root_dir", Recognizer.DEFAULT_ROOT)
-        root = self.get_parameter("root_dir").get_parameter_value().string_value
         if self._debug:
             self.get_logger().info(f'{self.get_name()} root is {root}')
 
-        encodings = Path(os.path.join(root, "faces.pkl"))
-        database = Path(os.path.join(root, "faces.json"))
+        encodings = Path(os.path.join(root, scenario, 'faces', "faces.pkl"))
+        database = Path(os.path.join(root, scenario, 'faces', "faces.json"))
     
         self._bridge = CvBridge()
 
@@ -55,7 +59,7 @@ class Recognizer(Node):
         self._sub = self.create_subscription(Image, self._camera_topic, self._camera_callback, 1) 
 
         # pubs
-        self._publisher = self.create_publisher(SpeakerInfo, self._topic, QoSProfile(depth=1))
+        self._publisher = self.create_publisher(SpeakerInfo, self._face_topic, QoSProfile(depth=1))
 
         self._face_recognizer = FaceRecognizer(encodings=encodings, database=database)
         self._face_recognizer.load_encodings()
@@ -65,8 +69,8 @@ class Recognizer(Node):
         img = self._bridge.imgmsg_to_cv2(data)
 
         bb, name, middle_row, middle_col = self._face_recognizer.recognize_faces(img)
-        if self._debug:
-            self.get_logger().info(f'{self.get_name()} bounding_box {bb} name is {name}')
+        #if self._debug:
+            #self.get_logger().info(f'{self.get_name()} bounding_box {bb} name is {name}')
 
         if bb is not None:
             sub = img[bb[0]:bb[2], bb[3]:bb[1],:]

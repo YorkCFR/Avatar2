@@ -10,12 +10,12 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-
-    root = '/home/baranparsai/Documents/Avatar2/scenarios/hearing_clinic'   # default location of faces.json, not in config file
+    root = '/home/baranparsai/Documents/Avatar2/scenarios'   # default location of faces.json
+    scenario = 'hearing_clinic'
+    config_file = os.path.join(root, scenario, 'config.json')
     debug = False
     ui_imagery = '/home/baranparsai/Documents/Avatar2/ros_avatar'   # default imagery location
     ros_ui = False
-    config_file = 'hearing_clinic_config.json'
 
     for arg in sys.argv[4:]:
         if arg.startswith('config_file:='):
@@ -30,9 +30,10 @@ def generate_launch_description():
            ui_imagery = arg.split('ui_imagery:=', 1)[1]
            print(f"Launching with imagery at {ui_imagery}")
         else:
-            print("Usage: launch avatar2 all.launch.py [config_file:=<config_file>] [ui_imagery:=<ui_imagery_root>] [ros_ui:= False|True]")
+            print("Usage: launch avatar2 all.launch.py [root:=<root>] [scenario:=<scenario>] [ui_imagery:=<ui_imagery_root>] [ros_ui:= False|True]")
             sys.exit()
-
+    print(f"using config form {config_file}")
+    
     with open(config_file) as f:
         config = json.load(f)
     print(f)
@@ -77,7 +78,8 @@ def generate_launch_description():
             executable='avatar_camera',
             name='avatar_camera',
             output='screen',
-            namespace="/avatar2")
+            namespace="/avatar2",
+            parameters=[{'port': config['camera_port']}])
     nodes.append(camera_node)
 
     face_recognizer_node = Node(
@@ -86,7 +88,7 @@ def generate_launch_description():
             name='head_detect',
             output='screen',
             namespace="/avatar2",
-            parameters=[{'root_dir' : root + '/faces', 'debug': debug}]) 
+            parameters=[{'config_file': config_file}])
     nodes.append(face_recognizer_node)
         
     llm_dolphin_clinic_node = Node(

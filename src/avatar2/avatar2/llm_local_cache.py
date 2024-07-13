@@ -7,7 +7,7 @@ import datetime
 import rclpy.time
 
 class LocalCache():
-    def __init__(self, node, filename=None, max_size=100, root=None):
+    def __init__(self, node, cache_file='cache.json', log_dir='log', max_size=100, root=None):
         self._max_size = max_size
         self._node = node
         self.cache = []
@@ -18,16 +18,11 @@ class LocalCache():
             'how many different types of hairing aids are there', 'what is the most common type of hearing aid', 'what is the most expensive hearing aid',
             'goodbye'
         }
-        self._node.get_logger().info(f"{self._node.get_name()} LocalCache alive!")
+        self._node.get_logger().info(f"{self._node.get_name()} LocalCache alive! caching at {cache_file} logging to {log_dir}")
+        self._logging_dir = log_dir
         
-        # Logging dir 
-        if root is not None:
-            self.logging_dir = root + '/logs/'
-        else:
-            self.logging_dir = "/home/walleed/Avatar2/scenarios/hearing_clinic/logs/"
-        
-        if filename is not None:
-            self._load_cache_fom_file(filename)
+        if cache_file is not None:
+            self._load_cache_fom_file(cache_file)
         self._initialize_permanent_entries()
             
     def _initialize_permanent_entries(self):
@@ -146,7 +141,7 @@ class LocalCache():
             time_diff = current_time - entry_time
             
             # Log the query, response, timestamp, count, entry time, current time and time difference to a csv file
-            log_filename = self.logging_dir + datetime.datetime.fromtimestamp(current_time).strftime('%Y-%m-%d') + "_log.csv"
+            log_filename = os.path.join(self._logging_dir, datetime.datetime.fromtimestamp(current_time).strftime('%Y-%m-%d')+ "_log.csv")
             if os.path.exists(log_filename):
                 with open(log_filename, 'a') as f:
                     f.write(f"{key}, {query_response}, {query_time}, {query_count}, {datetime.datetime.fromtimestamp(entry_time)}, {current_time}, {time_diff}, {in_cache} \n")

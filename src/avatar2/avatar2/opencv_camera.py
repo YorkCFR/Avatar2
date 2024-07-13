@@ -13,7 +13,7 @@ class OpenCVCamera(Node):
         self.declare_parameter('topic', rostopic)
         rostopic = self.get_parameter('topic').get_parameter_value().string_value
 
-        self.declare_parameter('port', str(port))
+        self.declare_parameter('port', port)
         port = self.get_parameter('port').get_parameter_value().integer_value
 
         self.get_logger().info(f'{self.get_name()} publishing from camera {port} on {rostopic}')
