@@ -123,13 +123,17 @@ class FaceRecognizer:
 
             if id >= 0:
                 name = self._database[id]
-        #self._print(name)
-
         return largest_face_location, name, middle_row, middle_col
+    
+    def estimate_distance(self, face_width_pixels, focal_length, sensor_height):
+        """Estimate distance using the depth estimation formula."""
+        real_face_width_mm = 160  # Real face width in mm
+        distance_mm = (real_face_width_mm * focal_length) / face_width_pixels
 
-    def Focal_Length_Finder(measured_distance, real_width, width_in_rf_image): 
-        focal_length = (width_in_rf_image * measured_distance) / real_width
-        return focal_length
+        distance_cm = distance_mm / 10  # Convert mm to cm
+        # self._print(f'distance from the camera is {distance_cm} cm')
+
+        return distance_cm
     
     def _recognize_face(self, unknown_encoding, loaded_encodings):
         """Recognize the face by comparing its encoding with loaded encodings.

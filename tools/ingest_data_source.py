@@ -9,7 +9,7 @@ from langchain.embeddings import SentenceTransformerEmbeddings
 import pickle
 
 # Load Data
-docs = ['hearing_clinic/information_about_hearing_clinic.txt']
+docs = ['/home/walleed/Avatar2/models/hearing_clinic/text/information_about_hearing_clinic.txtx']
 all_docs = []
 for doc in docs:
     print(f"Loading document {doc}")
@@ -25,5 +25,5 @@ print("Embeddings created")
 vectorstore = FAISS.from_documents(documents, embeddings)
 
 # Save vectorstore
-with open("vectorstore_clinic.pkl", "wb") as f:
+with open("hearing.pkl", "wb") as f:
     pickle.dump(vectorstore, f)

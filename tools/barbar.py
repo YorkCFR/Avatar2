@@ -8,7 +8,7 @@ import time
 
 def get_chain(vectorstore):
     global qa_prompt
-    llm =LlamaCpp(n_gpu_layers=12, model_path="./WizardLM-7B-uncensored.ggmlv3.q4_1.bin", temperature=0, n_ctx=2048, verbose=True, use_mlock=True)
+    llm =LlamaCpp(n_gpu_layers=12, model_path="models/hearing_clinic/WizardLM-7B-uncensored.Q4_K_M.gguf", temperature=0, n_ctx=2048, verbose=True, use_mlock=True)
     qa_chain = ChatVectorDBChain.from_llm(
         llm,
         vectorstore,
@@ -22,16 +22,17 @@ def get_chain(vectorstore):
 
 if __name__ == "__main__":
     question = "When is the museum open"
-    with open("vectorstore.pkl", "rb") as f:
+    with open("/home/walleed/Avatar2/models/hearing_clinic/hearing.pkl", "rb") as f:
         vectorstore = pickle.load(f)
-    llm =LlamaCpp(model_path="./WizardLM-7B-uncensored.Q4_K_M.gguf", temperature=0, n_ctx=2048, verbose=False,  n_gpu_layers=-1)
+    llm =LlamaCpp(model_path="models/hearing_clinic/WizardLM-7B-uncensored.Q4_K_M.gguf", temperature=0, n_ctx=2048, verbose=False,  n_gpu_layers=100)
+    retriever = vectorstore.as_retriever(search_kwargs={"k":2})
 
-
+    start_time = time.time()
     while True:
         print("Waiting for query>")
-        question = input()
-        start_time = time.time()
-        docs = vectorstore.as_retriever(search_kwargs={"k":2}).get_relevant_documents(query=question)
+        question = input()    
+        # docs = vectorstore.as_retriever(search_kwargs={"k":2}).get_relevant_documents(query=question)
+        docs = retriever.invoke(question)
 #        print(f"We got {len(docs)} documents from the vectore store")
 #        for doc in docs:
 #            print(f'|{doc.page_content}|')

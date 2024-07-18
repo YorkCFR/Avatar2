@@ -10,11 +10,11 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    root = '/home/baranparsai/Documents/Avatar2/scenarios'   # default location of faces.json
+    root = '/home/walleed/Avatar2/scenarios'   # default location of faces.json
     scenario = 'hearing_clinic'
     config_file = os.path.join(root, scenario, 'config.json')
     debug = False
-    ui_imagery = '/home/baranparsai/Documents/Avatar2/ros_avatar'   # default imagery location
+    ui_imagery = '/home/walleed/Avatar2/ros_avatar'   # default imagery location
     ros_ui = False
 
     for arg in sys.argv[4:]:
@@ -36,6 +36,7 @@ def generate_launch_description():
     
     with open(config_file) as f:
         config = json.load(f)
+        in_control_topic = config['in_control_topic']
     print(f)
     try:
         root = config['root']
@@ -62,7 +63,8 @@ def generate_launch_description():
              executable='sound_to_text',
              name='sound_to_text',
              output='screen',
-             namespace="/avatar2")
+             namespace="/avatar2",
+             parameters=[{'message': in_control_topic}])
     nodes.append(sound_to_text_node)
 
     text_to_sound = Node(
@@ -99,6 +101,14 @@ def generate_launch_description():
             namespace="/avatar2",
             parameters=[{'config_file': config_file}])
     nodes.append(llm_dolphin_clinic_node)
+    
+    control_node = Node(
+            package='avatar2_control',
+            executable='basic_control',
+            name='control',
+            output='screen',
+            namespace="/avatar2")
+    nodes.append(control_node)
 
     if ros_ui:
         ros_node = Node(

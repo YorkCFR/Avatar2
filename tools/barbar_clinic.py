@@ -5,6 +5,7 @@ from langchain.llms import LlamaCpp
 from langchain.chains import ChatVectorDBChain
 import time
 import pickle
+from langchain.memory import ConversationBufferMemory
 
 _template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
 You can assume the question about LangChain.
@@ -50,33 +51,43 @@ def get_chain(vectorstore):
     return qa_chain
 
 
-
-
 if __name__ == "__main__":
     question = "When is the clinic open"
-    with open("vectorstore_clinic.pkl", "rb") as f:
+    with open("scenarios/hearing_clinic/hearing.pkl", "rb") as f:
         vectorstore = pickle.load(f)
-    llm =LlamaCpp(model_path="../WizardLM-7B-uncensored.ggmlv3.q4_1.bin", temperature=0, n_ctx=3000, verbose=True,  n_gpu_layers=-1)
+    llm =LlamaCpp(model_path="llms/Nous-Hermes-2-Mistral-7B-DPO.Q4_K_M.gguf", temperature=0.1, n_ctx=4096, verbose=True,  n_gpu_layers=-1)
+    memory = ConversationBufferMemory(return_messages=True)
+    # prompt_template = """<|im_start|>system
+    # You are an assistant at the Exquisite Hearing Clinic. If you don't know the answer, just say "I'm not sure." Don't try to make up an answer. Your name is Mary. You can use emojis. Briefly summarize the clinic information. Highlight key points. End with a question to engage the user. Reply in a friendly, informal tone, as if you are chatting with a friend. Ensure that the response is empathetic and considerate of the user's emotional state.
+
+    # Context:
+    # {context}<|im_end|>
+    # <|im_start|>user
+    # User question: {question}<|im_end|>
+    # <|im_start|>assistant
+    # """
+    # context = "\n".join([doc.page_content for doc in docs])
+    # prompt = prompt_template.format(context=context, sentiment=sentiment, question=question)
 
     while True:
-        print("ASk a queation")
-        start_time = time.time()
+        print("Ask a question")
         question = input()
         docs = vectorstore.as_retriever().get_relevant_documents(query=question)
-        print(len(docs))
+        # chat_history = memory.load_memory_variables({})['history']
         sentiment = "neutral"
-        print(f"Response->{docs[0].page_content}")
-        prompt = f"""### Instruction: You are an assistant at the Exquisite Hearing Clinic . 
-           If you don't know the answer, just say "I'm not sure." Don't try to make up an answer.
-           Your name is Mary. You can use emojis. Breifly summarize the clinic information. Highlight key points. End with a question to engage the user. Reply in a frinedly, informal tone, as if you are chatting with a friend. Use the following pieces of context to answer the user's question. User who has asked the question has the follwing emotional sentiment: {sentiment} REspond accordingly. Ensure that the response is empathetic and considerate of the user's emotional state."""
-#        prompt = prompt + "\n" + docs[0].page_content
+        # print(f"Response->{docs[0].page_content}")
+        prompt = f"""<|im_start|>system: 
+        You are an assistant at the Exquisite Hearing Clinic . If you don't know the answer, just say "I'm not sure." Don't try to make up an answer. Your name is Mary. You can use emojis. Breifly summarize the clinic information. Highlight key points. End with a question to engage the user. Reply in a frinedly, informal tone, as if you are chatting with a friend. Use the following pieces of context to answer the user's question. User who has asked the question has the follwing emotional sentiment: {sentiment} REspond accordingly. Ensure that the response is empathetic and considerate of the user's emotional state."""
         for doc in docs:
-            prompt = prompt + "\n" + doc.page_content
-        prompt = prompt + f"\n### Input: {question}\n### Response:"
-    
-        print(prompt)
-        print(llm(prompt))
+            prompt = prompt + "\n" + doc.page_content + "<|im_end|>"
+        prompt = prompt + f"\n<|im_start|>user" +  "\n" + f" {question}<|im_end|>" + "\n" + f"<|im_start|>assistant" + "\n"
+
+        # print(prompt)
+        start_time = time.time()
+        response = llm(prompt)
+        print(f'Mary: {response}')
         print(f"Time taken: {time.time() - start_time}")
+        # memory.save_context({"input": question}, {"output": response})
 #    qa_chain = get_chain(vectorstore)
 #    chat_history = []
 #    print("Chat with your docs!")

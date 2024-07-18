@@ -75,9 +75,17 @@ class MetaHandler(py_trees.behaviour.Behaviour):
 
                 return py_trees.common.Status.SUCCESS
             except:
-                self._node.get_logger().warning(f'dont know {words[1]}')
-
-
+                self._node.get_logger().warning(f'dont know {key}')
+        else:
+            user_input = TaggedString()
+            user_input.header.stamp = self._node.get_clock().now().to_msg()
+            user_input.audio_sequence_number = sequence
+            user_input.text.data = str(in_text)
+            
+            self._blackboard.in_message = user_input
+            self._node.get_logger().warning(f'passing on to LLM {in_text}')
+            
+            return py_trees.common.Status.SUCCESS
         return py_trees.common.Status.FAILURE
 
     def terminate(self, new_status):

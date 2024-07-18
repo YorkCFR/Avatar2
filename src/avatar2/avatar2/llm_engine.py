@@ -24,7 +24,6 @@ class LLMEngine(Node):
                 config = json.load(f)
         except:
             raise Exception(f"Could not open {config_file}")
-
         self._debug = config.get('debug', True)
         if self._debug:
             self.get_logger().info(f'{self.get_name()} node created, debug is {self._debug}')
@@ -48,6 +47,8 @@ class LLMEngine(Node):
                 avatar_type = config['avatar']
                 scenario = config['scenario']
                 log_dir = config['log_dir']
+                n_gpu_layers = config['n_gpu_layers']
+                perm_entries_file = config.get('permanent_entries_file')
 
             except:
                 self.get_logger().error(f'{self.get_name()} missing data in config')
@@ -59,18 +60,19 @@ class LLMEngine(Node):
             format = os.path.join(root, scenario, format)
             cache = os.path.join(root, scenario, cache)
             log_dir = os.path.join(root, scenario, log_dir)
+            perm_entries_file = os.path.join(root, scenario, perm_entries_file)
 
 
             if avatar_type == 'langchain':
                 self.get_logger().info(f'{self.get_name()} Loading LLM model {model} vectorestore {vectorstore}')
-                self._llm = LLMLangChain(model=model, prompt=prompt, vectorstore=vectorstore, format=format)
+                self._llm = LLMLangChain(model=model, prompt=prompt, vectorstore=vectorstore, format=format, n_gpu_layers=n_gpu_layers)
                 self.get_logger().info(f'{self.get_name()} LLM model Loaded {model}')
-                self.local_cache = LocalCache(node=self, cache_file=cache, log_dir=log_dir, root=root)
+                self.local_cache = LocalCache(node=self, cache_file=cache, perm_entries_file=perm_entries_file, log_dir=log_dir, root=root)
             if avatar_type == 'faces':
                 self.get_logger().info(f'{self.get_name()} Loading LLM model {model} vectorestore {vectorstore}')
-                self._llm = LLMWithFaces(model=model, prompt=prompt, vectorstore=vectorstore, format=format, node=self)
+                self._llm = LLMWithFaces(model=model, prompt=prompt, vectorstore=vectorstore, format=format, node=self, n_gpu_layers=n_gpu_layers)
                 self.get_logger().info(f'{self.get_name()} LLM model Loaded {model}')
-            self.local_cache = LocalCache(node=self, cache_file=cache, log_dir=log_dir, root=root)
+                self.local_cache = LocalCache(node=self, cache_file=cache, perm_entries_file=perm_entries_file,log_dir=log_dir, root=root)
 
         else:
             if self._debug:

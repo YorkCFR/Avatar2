@@ -12,11 +12,7 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 def generate_launch_description():
-<<<<<<< HEAD
-    root = "/home/baranparsai/Documents/Avatar2/models/hearing_clinic/"  # NB: need trailing slash
-=======
     root = "/home/walleed/Avatar2/models/hearing_clinic/"  # NB: need trailing slash
->>>>>>> 869f8c6687afe53d29982b712565a199564a474e
     model = "WizardLM-7B-uncensored.Q4_K_M.gguf"
     format = "\n### Input: {question}\n### Response:"
     vectorstore = "hearing.pkl"

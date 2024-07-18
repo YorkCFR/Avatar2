@@ -7,25 +7,35 @@ import datetime
 import rclpy.time
 
 class LocalCache():
-    def __init__(self, node, cache_file='cache.json', log_dir='log', max_size=100, root=None):
+    def __init__(self, node, cache_file='cache.json', perm_entries_file='permanent_entries.json', log_dir='log', max_size=18, root=None):
         self._max_size = max_size
         self._node = node
         self.cache = []
         self.cache_map = {}
-        self.permanent_entries = {
-            'hi', 'hello', 'what is your name', 'how are you', 'tell me some information about the clinic',
-            'what kind of services are available at the clinic', 'who is the owner of the clinic', 'what can you tell me about penny', 'what does cyanide taste like',
-            'how many different types of hairing aids are there', 'what is the most common type of hearing aid', 'what is the most expensive hearing aid',
-            'goodbye'
-        }
+        self.permanent_entries = []
         self._node.get_logger().info(f"{self._node.get_name()} LocalCache alive! caching at {cache_file} logging to {log_dir}")
+        self._node.get_logger().info(f"{self._node.get_name()} Permanent entries at {perm_entries_file}")
         self._logging_dir = log_dir
+        if perm_entries_file is not None:
+            self._load_permanent_entries(perm_entries_file)
         
         if cache_file is not None:
             self._load_cache_fom_file(cache_file)
         self._initialize_permanent_entries()
             
+    def _load_permanent_entries(self, filename) -> None:
+        if os.path.exists(filename):
+            self._node.get_logger().info(f"{self._node.get_name()} Loading permanent entries from {filename}")
+            try:
+                with open(filename, 'r') as f:
+                    self.permanent_entries = json.load(f)
+            except Exception as e:
+                self._node.get_logger().error(f"{self._node.get_name()} Error loading permanent entries from {filename}: {e}")
+        else:
+            self._node.get_logger().info(f"{self._node.get_name()} No permanent entries file found at {filename}, starting with an empty list of permanent entries")
+            
     def _initialize_permanent_entries(self):
+        if len(self.permanent_entries) > 0:
             for key in self.permanent_entries:
                 key_normalized = key.lower().strip().translate(str.maketrans('', '', string.punctuation))
                 if key_normalized not in self.cache_map:
@@ -38,6 +48,8 @@ class LocalCache():
                     heapq.heappush(self.cache, (0, timestamp, key_normalized))
                 else:
                     self._node.get_logger().info(f"{self._node.get_name()} Key {key_normalized} already exists in the cache.")
+        else:
+            self._node.get_logger().info(f"{self._node.get_name()} No permanent entries found, starting with an empty list of permanent entries")
             
     def _load_cache_fom_file(self, filename) -> None:
         self._node.get_logger().info(f"{self._node.get_name()} Loading cache from {filename}")
@@ -53,7 +65,7 @@ class LocalCache():
                         self._log_responses(key_normalized)
                     self._node.get_logger().info(f"{self._node.get_name()} Loaded cache entries from {filename} with {len(data)} entries")
             except Exception as e:
-                self._node.get_logger().info(f"{self._node.get_name()} Error loading cache from {filename}: {e}")
+                self._node.get_logger().error(f"{self._node.get_name()} Error loading cache from {filename}: {e}")
         else:
             self._node.get_logger().info(f"{self._node.get_name()} No cache file found at {filename}, starting with an empty cache")
             
@@ -75,14 +87,14 @@ class LocalCache():
         query_normalized = query.lower().strip().translate(str.maketrans('', '', string.punctuation))
         # If the query is already in the cache, update the value, count, timestamp and input time 
         response_time = float(response_time)
-        # if query_normalized in self.cache_map:
-        #     self._update_cache(query_normalized, response, response_time)
-        # else:
         new_input_time = self._node.get_clock().now().nanoseconds / 1e9
         in_cache = False
         count = 0
-        self._node.get_logger().info(f"{self._node.get_name()} Adding to cache for {query_normalized}")
+        # self._node.get_logger().info(f"{self._node.get_name()} Adding to cache for {query_normalized}")
+        # self._node.get_logger().info(f"{self._node.get_name()} Number of entries in cache: {len(self.cache)}")
         if len(self.cache) >= self._max_size:
+            # self._node.get_logger().info(f"{self._node.get_name()} Cache map is full, cache map is {self.cache_map}")
+            # self._node.get_logger().info(f"{self._node.get_name()} Cache is full, cache is {self.cache}")
             self._evict_cache()
         self.cache_map[query_normalized] = (response, response_time, count, new_input_time, in_cache)
         # Log the responses
@@ -97,21 +109,20 @@ class LocalCache():
         in_cache = True
         new_count = count + 1
         new_timestamp = response_time
-        self._node.get_logger().info(f"{self._node.get_name()} Old timestamp: {old_timestamp}, New timestamp: {new_timestamp}")
-        self._node.get_logger().info(f"{self._node.get_name()} Old count: {count}, New count: {new_count}")
-        self._node.get_logger().info(f"{self._node.get_name()} Old input time: {input_time}, New input time: {new_input_time}")
+        # self._node.get_logger().info(f"{self._node.get_name()} Old timestamp: {old_timestamp}, New timestamp: {new_timestamp}")
+        # self._node.get_logger().info(f"{self._node.get_name()} Old count: {count}, New count: {new_count}")
+        # self._node.get_logger().info(f"{self._node.get_name()} Old input time: {input_time}, New input time: {new_input_time}")
         self.cache_map[query_normalized] = (response, new_timestamp, new_count, new_input_time, in_cache)
         # Log the responses
         self._log_responses(query_normalized)
         heapq.heappush(self.cache, (new_count, new_timestamp, query))
         
     def _evict_cache(self):
-        while self._heap:
-            count, timestamp, oldest = heapq.heappop(self.cache)
-            if oldest not in self.permanent_entries and oldest in self.cache_map and self.cache_map[oldest][1] == timestamp:
-                del self.cache_[oldest]
-                self._node.get_logger().info(f"{self._node.get_name()} Evicted {oldest} from cache")
-                break
+        # Evict the oldest entry from the cache
+        _, timestamp, oldest = heapq.heappop(self.cache)
+        if oldest not in self.permanent_entries and oldest in self.cache_map and self.cache_map[oldest][1] == timestamp:
+            del self.cache_map[oldest]
+            self._node.get_logger().info(f"{self._node.get_name()} Evicted {oldest} from cache")
             
     def save_cache_to_file(self, filename) -> None:
         try:
@@ -119,13 +130,13 @@ class LocalCache():
                 json.dump({key: [value, timestamp, count, input_time, in_cache] for key, (value, timestamp, count, input_time, in_cache) in self.cache_map.items()}, f, indent=4)
                 self._node.get_logger().info(f"{self._node.get_name()} Saved cache to {filename}")
         except Exception as e:
-            self._node.get_logger().info(f"{self._node.get_name()} Error saving cache to {filename}: {e}")
+            self._node.get_logger().warn(f"{self._node.get_name()} Error saving cache to {filename}: {e}")
             
     def _log_responses(self, query) -> None:
         if query in self.cache_map:
             key = query
             (value, timestamp, count, input_time, in_cache) = self.cache_map[query]
-            self._node.get_logger().info(f"{self._node.get_name()} Logging entry: {key} -> {value}, {timestamp}, {count}, {input_time}, {in_cache}")
+            # self._node.get_logger().info(f"{self._node.get_name()} Logging entry: {key} -> {value}, {timestamp}, {count}, {input_time}, {in_cache}")
             # Get the entry time of the query
             entry_time = input_time
             # Get the timestamp of the query 
