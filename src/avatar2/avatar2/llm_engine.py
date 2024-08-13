@@ -4,7 +4,7 @@ import json
 import sys
 from rclpy.node import Node
 from rclpy.qos import QoSProfile
-from avatar2_interfaces.msg import TaggedString
+from avatar2_interfaces.msg import TaggedString, SpeakerInfo
 from .llm import LLM
 from .llm_dummy import LLMDummy
 from .llm_langchain import LLMLangChain
@@ -17,6 +17,8 @@ class LLMEngine(Node):
         config_file = os.path.join(root_dir, scenario, 'config.json')
         self.declare_parameter('config_file', config_file)
         config_file = self.get_parameter('config_file').get_parameter_value().string_value
+        time_counter = 1
+        self._role = ''
 
         self.get_logger().info(f'{self.get_name()} loading config form {config_file}')
         try:
@@ -25,13 +27,19 @@ class LLMEngine(Node):
         except:
             raise Exception(f"Could not open {config_file}")
 
-        self._debug = config.get('debug', True)
+        # self._debug = config.get('debug', True)
+        self._debug = True
         if self._debug:
             self.get_logger().info(f'{self.get_name()} node created, debug is {self._debug}')
        
         avatar_type = config.get('avatar', 'faces')
         if self._debug:
             self.get_logger().info(f'{self.get_name()} Firing up an avatar of type {avatar_type}')
+
+        self.create_subscription(SpeakerInfo, '/avatar2/speaker_info', self._role_callback, QoSProfile(depth=1))
+        self.create_subscription(SpeakerInfo, '/avatar2/speaker_info', self._role_callback, QoSProfile(depth=1))
+        self.create_subscription(SpeakerInfo, '/avatar2/speaker_info', self._role_callback, QoSProfile(depth=1))
+        self.create_subscription(SpeakerInfo, '/avatar2/speaker_info', self._role_callback, QoSProfile(depth=1))
 
         if avatar_type == 'dummy':
             self._llm = LLMDummy()
@@ -86,12 +94,17 @@ class LLMEngine(Node):
         if self._debug:
             self.get_logger().info(f"{self.get_name()} listening got {msg.text.data}")
         if self._debug:
-            self.get_logger().info(f"{self.get_name()} checking cache for {msg.text.data}")
+            self.get_logger().info(f"{self.get_name()} checking cache for {msg.text.data}")        
         response, response_time = self.local_cache.get(msg.text.data)
+        llm_input = msg.text.data
 
         if response is None:
+            if (self._role == ''):
+                self.get_logger().info(f"No role found")
+            else:
+                llm_input = llm_input + f"User has role {self._role}. Respond accordingly"
             start_time = self.get_clock().now()
-            prompt, response = self._llm.response(text=msg.text.data)
+            prompt, response = self._llm.response(text=llm_input)
             time_taken = (self.get_clock().now() - start_time).nanoseconds / 1e9
             # Add to cache
             self.local_cache.put(msg.text.data, response, time_taken)
@@ -106,6 +119,21 @@ class LLMEngine(Node):
         tagged_string.audio_sequence_number = msg.audio_sequence_number
         tagged_string.text.data = str(response)
         self._publisher.publish(tagged_string)
+
+    def _role_callback(self, msg_role):
+        """Deal with Roles from Face Recognizer"""
+        data = msg_role.info.data
+        self.get_logger().info(f"Got the data {data}")
+        if self._debug:
+            self.get_logger().info(f"{self.get_name()} listening got {data}")
+        try:
+            info = json.loads(data)
+            self._role = info['role']
+            # role = info.get('role', 'roomate')
+            self.get_logger().info(f"{self.get_name()} got role {self._role}")
+        except Exception as e:
+            self.get_logger().error(f"Error processing message: {e}")
+            return
 
 def main(args=None):
     rclpy.init(args=args)

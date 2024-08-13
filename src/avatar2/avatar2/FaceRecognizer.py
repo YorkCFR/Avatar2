@@ -19,7 +19,8 @@ class FaceRecognizer:
         self.people_info = []
         self._encodings_location = encodings
         self.load_encodings()
-        self._debug = debug
+        #self._debug = debug
+        self._debug = True
     
         with open(database) as f:
             self._database = json.load(f)
@@ -33,12 +34,6 @@ class FaceRecognizer:
         """Load face encodings from a pickle file."""
         with self._encodings_location.open(mode="rb") as f:
             self._loaded_encodings = pickle.load(f)
-    
-    def _create_directories(self):
-        """Create necessary directories if they don't exist."""
-        Path("training").mkdir(exist_ok=True)
-        Path("output").mkdir(exist_ok=True)
-        Path("validation").mkdir(exist_ok=True)
     
     @staticmethod
     def encode_known_faces(data_loc: str = "training", model: str = "hog", face_db = DEFAULT_ENCODINGS_PATH, face_info = PEOPLE_INFO_PATH) -> None:
@@ -135,7 +130,7 @@ class FaceRecognizer:
                     distance = None
                     continue
 
-        #self._print(f"largest box is {largest_face_area}")
+        # self._print(f"largest box is {largest_face_area}")
         id = -1
         name = {'name': 'unknown', 'ID': -1, 'role': 'unknown'}
 
@@ -149,11 +144,10 @@ class FaceRecognizer:
     
     def estimate_distance(self, face_width_pixels, focal_length, sensor_height):
         """Estimate distance using the depth estimation formula."""
-        real_face_width_mm = 160  # Real face width in mm
+        real_face_width_mm = 160
         distance_mm = (real_face_width_mm * focal_length) / face_width_pixels
-
-        distance_cm = distance_mm / 10  # Convert mm to cm
-        #self._print(f'distance from the camera is {distance_cm} cm')
+        distance_cm = distance_mm / 10
+        # self._print(f'distance from the camera is {distance_cm} cm')
 
         return distance_cm
     
