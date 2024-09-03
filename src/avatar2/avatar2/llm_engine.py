@@ -27,8 +27,7 @@ class LLMEngine(Node):
         except:
             raise Exception(f"Could not open {config_file}")
 
-        # self._debug = config.get('debug', True)
-        self._debug = True
+        self._debug = config.get('debug', True)
         if self._debug:
             self.get_logger().info(f'{self.get_name()} node created, debug is {self._debug}')
        
@@ -36,9 +35,6 @@ class LLMEngine(Node):
         if self._debug:
             self.get_logger().info(f'{self.get_name()} Firing up an avatar of type {avatar_type}')
 
-        self.create_subscription(SpeakerInfo, '/avatar2/speaker_info', self._role_callback, QoSProfile(depth=1))
-        self.create_subscription(SpeakerInfo, '/avatar2/speaker_info', self._role_callback, QoSProfile(depth=1))
-        self.create_subscription(SpeakerInfo, '/avatar2/speaker_info', self._role_callback, QoSProfile(depth=1))
         self.create_subscription(SpeakerInfo, '/avatar2/speaker_info', self._role_callback, QoSProfile(depth=1))
 
         if avatar_type == 'dummy':
@@ -123,14 +119,14 @@ class LLMEngine(Node):
     def _role_callback(self, msg_role):
         """Deal with Roles from Face Recognizer"""
         data = msg_role.info.data
-        self.get_logger().info(f"Got the data {data}")
         if self._debug:
+            self.get_logger().info(f"Got the data {data}")
             self.get_logger().info(f"{self.get_name()} listening got {data}")
         try:
             info = json.loads(data)
             self._role = info['role']
-            # role = info.get('role', 'roomate')
-            self.get_logger().info(f"{self.get_name()} got role {self._role}")
+            if self._debug:
+                self.get_logger().info(f"{self.get_name()} got role {self._role}")
         except Exception as e:
             self.get_logger().error(f"Error processing message: {e}")
             return

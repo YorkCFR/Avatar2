@@ -19,7 +19,6 @@ from ament_index_python.packages import get_package_share_directory
 from rclpy.qos import QoSProfile
 from rclpy.qos import qos_profile_sensor_data
 from .FaceRecognizer import FaceRecognizer
-from .FaceRecognizer import FaceRecognizer
 
 
 class Recognizer(Node):
@@ -61,7 +60,7 @@ class Recognizer(Node):
         # pubs
         self._publisher = self.create_publisher(SpeakerInfo, self._face_topic, QoSProfile(depth=1))
 
-        self._face_recognizer = FaceRecognizer(encodings=encodings, database=database)
+        self._face_recognizer = FaceRecognizer(encodings=encodings, database=database, debug=self._debug)
         self._face_recognizer.load_encodings()
         
     

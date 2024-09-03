@@ -6,7 +6,7 @@ import rclpy
 
 from .MetaHandler import MetaHandler
 from .AvatarHandler import AvatarHandler
-from avatar2_interfaces.msg import TaggedString
+from avatar2_interfaces.msg import TaggedString, SpeakerInfo
 
 
 
@@ -22,19 +22,23 @@ def controller_create_root() -> py_trees.behaviour.Behaviour:
     in_control_message = py_trees_ros.subscribers.ToBlackboard(name="in_control_message",
          qos_profile=py_trees_ros.utilities.qos_profile_unlatched(),
          topic_name="/avatar2/in_control_message", topic_type=TaggedString, blackboard_variables = {'in_control_message' : None})
+    
+    speaker_info = py_trees_ros.subscribers.ToBlackboard(name="speaker_info",
+          qos_profile=py_trees_ros.utilities.qos_profile_unlatched(),
+          topic_name="/avatar2/speaker_info", topic_type=SpeakerInfo, blackboard_variables = {'speaker_info' : None})
 
     # automatically publish interesting ros tops from the blackboard
     out_message = py_trees_ros.publishers.FromBlackboard(name="out_mesage",
-        topic_name = '/avatar2/out_message',
+        topic_name = "/avatar2/out_message",
         topic_type = TaggedString,
         qos_profile = py_trees_ros.utilities.qos_profile_unlatched(),
-        blackboard_variable = '/out_message')
+        blackboard_variable = "/out_message")
     
     in_message = py_trees_ros.publishers.FromBlackboard(name="in_message",
-        topic_name = '/avatar2/in_message',
+        topic_name = "/avatar2/in_message",
         topic_type = TaggedString,
         qos_profile = py_trees_ros.utilities.qos_profile_unlatched(),
-        blackboard_variable = '/in_message')
+        blackboard_variable = "/in_message")
     
     # Deal with meta commands to the avatar
     meta = MetaHandler("meta handler")
@@ -52,6 +56,7 @@ def controller_create_root() -> py_trees.behaviour.Behaviour:
     bits.add_child(meta)
     bits.add_child(avatar)
     topics2bb.add_child(in_control_message)
+    topics2bb.add_child(speaker_info)
     root.add_child(topics2bb)
     root.add_child(bits)
     root.add_child(out_message)

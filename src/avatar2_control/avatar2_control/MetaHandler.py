@@ -2,6 +2,7 @@ import py_trees
 from avatar2_interfaces.msg import TaggedString
 import string
 import re
+import json
 
 class MetaHandler(py_trees.behaviour.Behaviour):
     """Handle meta requests to the avatar. Note that this is not intended to replace langchain or similar
@@ -31,23 +32,38 @@ class MetaHandler(py_trees.behaviour.Behaviour):
         say_this.header.stamp = self._node.get_clock().now().to_msg()
         sequence = self._blackboard.in_control_message.audio_sequence_number
         say_this.audio_sequence_number = sequence
-        say_this.text.data = str(in_text)
-        self._blackboard.out_message = user_input
+        say_this.text.data = str(s)
+        self._blackboard.out_message = say_this
         
     # handlers must return 
-    def _handler_awake(self, words):
-        self._node.get_logger.debug(f"  {self.name} [awake handler called]")
-        if not self_sleeping:
-            self.say_something_directly("But I am not sleeping now.")
-        else:                          
-            self._sleeping = False
-            self.say_something_directly("Ok. I am awake.")
-
-    def _handler_sleep(self, words):
-        self._node.get_logger.debug(f"  {self.name} [sleep handler called]")
+    def _handler_awake(self, words, speaker_name=None):
+        """ Handler for the awake command """
+        self._node.get_logger().warning(f"  {self.name} [awake handler called], sleeping is {self._sleeping}")
         if not self._sleeping:
-            self.say_something_directly("Ok. I am going to sleep. Tell me to wake up if you want me to listen")
-        self._sleeping = True
+            # if the avatar is already awake, then we should say something
+            if speaker_name is not None:
+                self._say_something_directly(f"But {speaker_name}, I am not sleeping now.")
+            else:
+                self._say_something_directly("But I am not sleeping now.")
+        else:
+            # if the avatar is sleeping, then we should wake it up
+            self._sleeping = False
+            self._say_something_directly("Ok. I am awake now.")
+            self.get_logger().warning(f"  {self.name} [sleep handler called], sleeping is {self._sleeping}")
+
+    def _handler_sleep(self, words, speaker_name=None):
+        """ Handler for the sleep command """
+        self._node.get_logger().warning(f"  {self.name} [sleep handler called], sleeping is {self._sleeping}")
+        if not self._sleeping:
+            # if the avatar is already awake, then we should put it to sleep
+            self._sleeping = True
+            if speaker_name is not None:
+                self._say_something_directly(f"Ok {speaker_name}, I am going to sleep. Tell me to wake up if you want me to listen")
+            else:
+                self._say_something_directly("Ok. I am going to sleep. Tell me to wake up if you want me to listen")
+        else :
+            # if the avatar is already sleeping, then we do nothing
+            self.get_logger().warning(f"  {self.name} [sleep handler called], sleeping is {self._sleeping}")
         
 
     def setup(self, **kwargs):
@@ -66,14 +82,20 @@ class MetaHandler(py_trees.behaviour.Behaviour):
         self._blackboard.register_key(key="/avatar_name_pattern", access=py_trees.common.Access.READ)
         self._blackboard.register_key(key="/out_message", access=py_trees.common.Access.WRITE)
         self._blackboard.register_key(key="/in_message", access=py_trees.common.Access.WRITE)
+        self._blackboard.register_key(key="/speaker_info", access=py_trees.common.Access.READ)
 
     def update(self):
         self.logger.debug(f"  {self.name} [MetaHandler:update()]")
         self._node.get_logger().warning(f'meta handler update text is {self._blackboard.in_control_message.text.data}')
         self._node.get_logger().warning(f'meta handler update number is {self._blackboard.in_control_message.audio_sequence_number}')
 
+        speaker_info = json.loads(self._blackboard.speaker_info.info.data)
+        self._node.get_logger().warning(f'speaker info is {speaker_info}')
         sequence = self._blackboard.in_control_message.audio_sequence_number
         in_text = self._blackboard.in_control_message.text.data.lower()
+        speaker_first_name = speaker_info['first_name']
+        speaker_last_name = speaker_info['last_name']
+        speaker_role = speaker_info['role']
         
         avatar_name = self._blackboard.avatar_name.lower()
         self._node.get_logger().warning(f'Avatars name is {avatar_name}')
@@ -83,6 +105,14 @@ class MetaHandler(py_trees.behaviour.Behaviour):
         # if the avatar is sleeping, ignore all commands and return "I am sleeping"
         if self._sleeping:
             self._node.get_logger().warning(f'avatar is sleeping')
+            # Check if the speaker is trying to wake the avatar
+            if self.check_awake_command(in_text, avatar_name_pattern):
+                self._handler_awake([], speaker_name=speaker_first_name)
+            # Try to see if we have speaker info to say something
+            if speaker_first_name is not None:
+                self._say_something_directly(f"Sorry {speaker_first_name}, I am sleeping right now.")
+            else:
+                self._say_something_directly("Sorry, I am sleeping right now.")
             return py_trees.common.Status.SUCCESS
         else:
             self._node.get_logger().warning(f'avatar is awake')
@@ -103,10 +133,10 @@ class MetaHandler(py_trees.behaviour.Behaviour):
             key = "".join(words[1:])
             self._node.get_logger().warning(f'We should process this {key}')
             try:
-                self._handlers[key](words)
+                self._handlers[key](words, speaker_name=speaker_first_name)
                 self._node.get_logger().warning(f'{key} has been processed. Not sending to the llm')                
                 return py_trees.common.Status.SUCCESS
-            except:
+            except KeyError:
                 self._node.get_logger().warning(f'dont know {key}')
         
         user_input = TaggedString()
@@ -121,4 +151,10 @@ class MetaHandler(py_trees.behaviour.Behaviour):
     def terminate(self, new_status):
         self.logger.debug(f"  {self.name} [MetaHandler:terminate()][{self.status}->{new_status}]")
         
-        
+    def check_awake_command(self, in_text, avatar_name_pattern):
+        in_text = in_text.translate(str.maketrans('', '', string.punctuation))
+        words = in_text.split()
+        if (len(words) > 1) and (re.match(avatar_name_pattern, words[0]) is not None):
+            key = "".join(words[1:])
+            if key == 'awake' or key == 'wake' or key == 'wakeup':
+                return True

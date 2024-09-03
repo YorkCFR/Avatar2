@@ -2,7 +2,7 @@
     "root": "/home/walleed/Avatar2/scenarios",
     "scenario": "hearing_clinic",
     "camera_port": 0,
-    "debug": false,
+    "debug": 0,
     "out_topic": "/avatar2/out_message",
     "in_topic": "/avatar2/in_message",
     "avatar": "faces",
@@ -17,7 +17,7 @@
     "focal_length": 615.0,
     "sensor_height": 3.6,
     "real_face_width": 160,
-    "n_gpu_layers": -1,
+    "n_gpu_layers": 30,
     "permanent_entries_file": "permanent_entries.json",
     "in_control_topic": "/avatar2/in_control_message"
 }

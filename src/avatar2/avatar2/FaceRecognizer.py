@@ -19,12 +19,11 @@ class FaceRecognizer:
         self.people_info = []
         self._encodings_location = encodings
         self.load_encodings()
-        #self._debug = debug
-        self._debug = True
+        self._debug = debug
     
         with open(database) as f:
             self._database = json.load(f)
-        #self._print(self._database)
+            self._print(f"Database loaded: {self._database}")
 
     def _print(self,s):
         if self._debug:
@@ -42,18 +41,15 @@ class FaceRecognizer:
         people_info = []
         encodings = []
         json_out = []
-        #print(data_loc)
 
         for person in Path(data_loc).glob("*"):
-            print(person)
             first_name, last_name = person.name.split("_")
             person_info = {'first_name': first_name, 'last_name': last_name, 'ID': person_id, 'role': 'unknown'}
             json_file = []
 
             for z in Path(person).glob("*.json"):
                 json_file.append(z)
-            #print(json_file)
-
+            
             if len(json_file) != 1 :
                 person_json_path = os.path.join(person, f"{first_name}_{last_name}.json")
                 with open(person_json_path, 'w') as person_json_file:
@@ -129,14 +125,14 @@ class FaceRecognizer:
                     largest_face_location = None
                     distance = None
                     continue
-
-        # self._print(f"largest box is {largest_face_area}")
+        
+        self._print(f"largest box is {largest_face_area}")
         id = -1
         name = {'name': 'unknown', 'ID': -1, 'role': 'unknown'}
 
         if largest_face_area > 0:
             id = self._recognize_face(unknown_encoding, self._loaded_encodings)
-            #self._print(f"the id is {id}")
+            self._print(f"the id is {id}")
 
             if id >= 0:
                 name = self._database[id]
@@ -147,7 +143,7 @@ class FaceRecognizer:
         real_face_width_mm = 160
         distance_mm = (real_face_width_mm * focal_length) / face_width_pixels
         distance_cm = distance_mm / 10
-        # self._print(f'distance from the camera is {distance_cm} cm')
+        self._print(f'distance from the camera is {distance_cm} cm')
 
         return distance_cm
     
@@ -164,16 +160,16 @@ class FaceRecognizer:
         
         if votes:
             all_faces = Counter(loaded_encodings["names"])
-            #self._print(f"all_faces {all_faces}")
+            self._print(f"all_faces {all_faces}")
             
             all_faces_l = list(all_faces)
-            #self._print(f"all_faces_l {all_faces_l}")
+            self._print(f"all_faces_l {all_faces_l}")
 
             best_face = all_faces_l[0]
             best_count = -1
 
             for face in all_faces_l:
-                #self._print(f"working out face {face} votes {votes[face]} total_faces {all_faces[face]} best_face {best_face}")
+                self._print(f"working out face {face} votes {votes[face]} total_faces {all_faces[face]} best_face {best_face}")
                 score = float(votes[face]) / float(all_faces[face])
 
                 if score > best_count:
