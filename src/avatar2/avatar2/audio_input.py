@@ -4,6 +4,7 @@
 # Very few formats are supported
 #
 # Version History
+# V3.2 added (empty) string to the message
 # V3.1 added sound device
 # V3.0 renamed default topics and added support for the audio format
 # V2.0 general software refactoring
@@ -15,6 +16,7 @@ import rclpy.logging
 from rclpy.node import Node
 import speech_recognition as sr
 from rclpy.qos import QoSProfile
+from std_msgs.msg import String
 from avatar2_interfaces.msg import Audio
 import sounddevice
 
@@ -68,6 +70,8 @@ class ProcessAudioNode(Node):
                 msg = Audio()
                 msg.format = "WAV_1_" + str(self._sample_rate)
                 msg.audio = audio.get_wav_data().hex()
+                msg.text = String()
+                msg.text.data = ""
                 msg.header.stamp = self.get_clock().now().to_msg()
                 msg.seq = self._msg_id
                 self._msg_id = self._msg_id + 1

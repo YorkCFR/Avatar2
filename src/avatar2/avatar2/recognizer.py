@@ -12,7 +12,6 @@ from rclpy.node import Node
 from std_srvs.srv import SetBool
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
-from std_msgs.msg import String
 from geometry_msgs.msg import Twist
 from avatar2_interfaces.msg import SpeakerInfo
 from ament_index_python.packages import get_package_share_directory

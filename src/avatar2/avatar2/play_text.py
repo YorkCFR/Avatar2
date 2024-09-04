@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from avatar2_interfaces.msg import AudioInput, TaggedString
+from avatar2_interfaces.msg import TaggedString
 from avatar2_interfaces.srv import Listen
 from rclpy.qos import QoSProfile
 import whisper
@@ -10,7 +10,7 @@ import os
 class PlayText(Node):
     def __init__(self):
         super().__init__('play_text_node')
-        self.declare_parameter('topic', '/avatar2/message')
+        self.declare_parameter('topic', '/avatar2/out_message')
         topic = self.get_parameter('topic').get_parameter_value().string_value
         self.declare_parameter('period', 5.0)
         self._period = self.get_parameter('period').get_parameter_value().double_value

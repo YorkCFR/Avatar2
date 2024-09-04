@@ -1,4 +1,11 @@
+Low Level Launch Files
+* avatar_audio_launch.py - just launches sound to text/text to sound
+* avatar_face_detect.launch.py - launches face recognition nodes
+* avatar_microphone.launch.py - launches sound capture node
+* ros_avatar.launch.py - launch the ros avatar 
 
+* all_control.launch.py - launches everything including control tool
+* all_launch.py - launchces everything except control tool
 
 Installation Notes
 

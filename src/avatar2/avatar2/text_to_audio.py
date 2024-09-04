@@ -1,5 +1,6 @@
 import rclpy
 from rclpy.node import Node
+from std_msgs.msg import String
 from avatar2_interfaces.msg import Audio, TaggedString
 from rclpy.qos import QoSProfile
 from TTS.utils.manage import ModelManager
@@ -46,6 +47,8 @@ class Text2AudioNode(Node):
             msg = Audio()
             msg.audio = audio_data.hex()
             msg.format = "WAV_1_22050"  # known magically
+            msg.text = String()
+            msg.text.data = data.text.data
             msg.header.stamp = self.get_clock().now().to_msg()
             msg.seq = data.audio_sequence_number
             self._publisher.publish(msg)
