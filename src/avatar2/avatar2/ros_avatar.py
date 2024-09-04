@@ -47,6 +47,7 @@ class ROSAvatar(Node):
         self._play = None
         self._req.listen = True
         self._cli.call_async(self._req)  # ignore return value
+        self._text = ""
 
         self._subscriber = self.create_subscription(Audio, self._topic, self._callback, 1)
         self.create_timer(0.1, self._timer_callback)
@@ -69,6 +70,18 @@ class ROSAvatar(Node):
             t = time.time() - self._playtime
             alpha = 0.5 * (1 - math.cos(t * 2 * math.pi / 2))
             mix = cv2.addWeighted(self._im_talk[self._frameid], alpha, self._im_sleep[self._frameid], 1-alpha, 0)
+            # Need to work on text being centered and wrapping properly
+            text = self._text
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            font_scale = 0.25
+            font_thickness = 1
+            text_color = (255, 255, 255)
+            text_size, _ = cv2.getTextSize(text, font, font_scale, font_thickness)
+            text_width = text_size[0]
+            text_height = text_size[1]
+            text_x = (mix.shape[1] - text_width) // 2
+            text_y = mix.shape[0] - text_height - 10
+            cv2.putText(mix, text, (text_x, text_y), font, font_scale, text_color, font_thickness, cv2.LINE_AA)
             cv2.imshow('Avatar', mix)
             if self._debug:
                 self.get_logger().info(f'{self.get_name()} playing')
@@ -92,6 +105,7 @@ class ROSAvatar(Node):
             return
         self._req.listen = False
         self._cli.call_async(self._req)  # ignore return value
+        self._text = data.text.data
         self._play = sound.play()
         self._playtime = time.time()
         
