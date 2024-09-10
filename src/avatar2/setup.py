@@ -38,6 +38,7 @@ setup(
             'play_audio_syncd = avatar2.play_audio_syncd:main',
             'llm_engine = avatar2.llm_engine:main',
             'ros_avatar = avatar2.ros_avatar:main',
+            'llm_only = avatar2.llm_only:main',
         ],
     },
 )
