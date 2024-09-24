@@ -27,7 +27,7 @@ class LLMOnly(Node):
         self.declare_parameter('out_topic', '/avatar2/response')
         out_topic = self.get_parameter('out_topic').get_parameter_value().string_value
 
-        self.declare_parameter('excuses', '["I am sorry, I cant do that right now", "My shift starts in a few minutes"]')
+        self.declare_parameter('excuses', '["I am sorry, I cant do that right now", "My shift starts in a few minutes", "Ask me next week"]')
         self._excuses = json.loads(self.get_parameter('excuses').get_parameter_value().string_value)
 
         self.declare_parameter('model', 'model.file')
@@ -36,9 +36,10 @@ class LLMOnly(Node):
         self._publisher = self.create_publisher(TaggedString, out_topic, QoSProfile(depth=1))
         self.create_subscription(TaggedString, in_topic, self._callback, QoSProfile(depth=1))
 
+
         self._loaded = False
         self._clean = False
-        self._thread = Thread(target=self._thread, args=[self._model])
+        self._thread = Thread(target=self._thread, args=[None])
         self._thread.start()
         self.get_logger().info(f"{self.get_name()} publishing to {out_topic}")
 
@@ -47,9 +48,9 @@ class LLMOnly(Node):
         n_ctx=2048,
         temperature=0,
         n_gpu_layers=26
-        self.get_logger().info(f"{self.get_name()} llm loading started {args}")
-        time.sleep(5)
-#        self._llm = LlamaCpp(model_path=args, temperature=temperature, n_ctx=n_ctx, verbose=verbose,  n_gpu_layers=n_gpu_layers)
+        self.get_logger().info(f"{self.get_name()} llm loading started {self._model}")
+#        self._llm = LlamaCpp(model_path=self._model, temperature=0, n_ctx=2048, n_gpu_layers=26)
+        self._llm = LlamaCpp(model_path=self._model, temperature=0)
         self.get_logger().info(f"{self.get_name()} llm loaded async")
         self._loaded = True
 
@@ -64,8 +65,7 @@ class LLMOnly(Node):
                 self._thread.join()
         
         if self._loaded == True:
-            resp = "ha ha some day"
-#            resp = self._llm(text.text.data)
+            resp = self._llm(text.text.data)
         else:
             resp = random.choice(self._excuses)
         tagged_string = TaggedString()
