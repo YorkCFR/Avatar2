@@ -20,9 +20,9 @@ class ConversationTrackerNode(Node):
             self.get_logger().error(f'{self.get_name()} unable to open config_file {config_file}')
             sys.exit(1)
         
-        self._debug = True
+        # self._debug = True
         try:
-            # self._debug = config['debug']
+            self._debug = config['debug']
             self._face_topic = config['face_topic']
             self._tracker_topic = config['tracker_topic']
             self._conversation_timeout = config['conversation_timeout']

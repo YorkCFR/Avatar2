@@ -19,5 +19,8 @@
     "real_face_width": 160,
     "n_gpu_layers": 30,
     "permanent_entries_file": "permanent_entries.json",
-    "in_control_topic": "/avatar2/in_control_message"
+    "in_control_topic": "/avatar2/in_control_message",
+    "tracker_topic": "/avatar2/user_info",
+    "conversation_timeout": 30,
+    "new_person_threshold": 60
 }

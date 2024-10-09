@@ -10,11 +10,11 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    root = '/home/baranparsai/Documents/Avatar2/scenarios'   # default location of faces.json
+    root = '/home/walleed/Avatar2/scenarios'   # default location of faces.json
     scenario = 'hearing_clinic'
     config_file = os.path.join(root, scenario, 'config.json')
     debug = False
-    ui_imagery = '/home/baranparsai/Documents/Avatar2/ros_avatar'   # default imagery location
+    ui_imagery = '/home/walleed/Avatar2/ros_avatar'   # default imagery location
     ros_ui = False
 
     for arg in sys.argv[4:]:
@@ -100,6 +100,15 @@ def generate_launch_description():
             namespace="/avatar2",
             parameters=[{'config_file': config_file}])
     nodes.append(llm_hermes_clinic_node)
+    
+    user_tracker_node = Node(
+            package='avatar2',
+            executable='user_tracker',
+            name='user_tracker',
+            output='screen',
+            namespace="/avatar2",
+            parameters=[{'config_file': config_file}])
+    nodes.append(user_tracker_node)
 
     rosbridge_node = Node(
             package='rosbridge_server',
