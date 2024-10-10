@@ -40,6 +40,7 @@ setup(
             'ros_avatar = avatar2.ros_avatar:main',
             'llm_only = avatar2.llm_only:main',
             'sentiment_analysis = avatar2.sentiment_analysis:main',
+            'user_tracker = avatar2.user_tracker:main'
         ],
     },
 )
