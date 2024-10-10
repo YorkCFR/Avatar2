@@ -7,7 +7,7 @@ from sensor_msgs.msg import Image
 
 class OpenCVCamera(Node):
 
-    def __init__(self, rostopic='/mycamera/image_raw', port=2):
+    def __init__(self, rostopic='/avatar2/avatar_camera/image_raw', port=2):
         super().__init__('avatar_camera')
 
         self.declare_parameter('topic', rostopic)

@@ -20,25 +20,26 @@ setup(
     maintainer='walleed',
     maintainer_email='walleed@todo.todo',
     description='TODO',
-    license='TODO: License declaration',
+    license='MIT license',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'sound_capture = avatar2.audio_input:main',
-            'sound_play = avatar2.audio_input_wav:main',
-            'sound_dump = avatar2.audio_dump:main',
-            'sound_to_text = avatar2.audio_to_text:main',
-            'avatar_camera = avatar2.opencv_camera:main',
-            'sentiment_analysis = avatar2.sentiment_analysis:main',
-            'head_detect = avatar2.recognizer:main',
-            'view_head_info = avatar2.view_face:main',
+            'avatar_camera = avatar2.opencv_camera:main',               # capture video
+            'avatar_camera_view = avatar2.view_camera:main',            # display raw video (debug)
+            'head_detect = avatar2.recognizer:main',                    # do head detection
+            'view_head_info = avatar2.view_face:main',                  # display head detection output (debug)
+            'sound_capture = avatar2.audio_input:main',			# capture audio from a microphone
+            'sound_play = avatar2.audio_input_wav:main',		# play a wav file
+            'sound_dump = avatar2.audio_dump:main',			# dump audio file
+            'sound_to_text = avatar2.audio_to_text:main',		# convert audio to text
+            'play_text = avatar2.play_text:main',			# convert text to wav
             'text_to_sound = avatar2.text_to_audio:main',
-            'play_text = avatar2.play_text:main',
             'play_text_syncd = avatar2.play_text_syncd:main',
             'play_audio_syncd = avatar2.play_audio_syncd:main',
             'llm_engine = avatar2.llm_engine:main',
             'ros_avatar = avatar2.ros_avatar:main',
             'llm_only = avatar2.llm_only:main',
+            'sentiment_analysis = avatar2.sentiment_analysis:main',
         ],
     },
 )

@@ -1,5 +1,7 @@
 # Avatar2
-The updated avatar. This is a generic README.md that describes the in-flux state of the avatar as of July 2024.
+The updated avatar. This is a generic README.md that describes the in-flux state of the avatar as of October 2024.
+ 
+There have been some major changes since the version in the summer. Perhaps the most critical of these is that the data from the face recognition system now includes much more information.
 
 The avatar uses ROS2 for message passing. The passing system is set up so that all messages are sent/received. So far this has not been an issue
 
@@ -18,12 +20,17 @@ We have a number of scenarios for the avatar. The details for a given scenario s
 ## Lower level tools
 To run/start various lower level pieces, the following launch files are quite useful
 
-- avatar_video.launch.py - This launches the camera and the head tracking/identification system
+- avatar_debug_video.launch.py - This launches the camera and a camera viewer
+- avatar_debug_recognizer.launch.py - This launches the camera and the face recognizer
 - avatar_microphone.launch.py - This launches the microphone monitoring code
 - avata_audio.launch.py - This launches the speech to text and text to speech code
 
 
 The debris folder is a place for things that were important once, but are no longer part of the main branch of the avatar.
 
+
+The following python libraries need to be installed
+
+- face_recognition
 
 

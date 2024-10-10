@@ -39,6 +39,7 @@ class Recognizer(Node):
             self._camera_topic = config['camera_topic']
             root = config['root']
             scenario = config['scenario']
+            person_colasses = config['person_classes']
         
         except:
             self.get_logger().error(f'{self.get_name()} unable to get params from {config_file}')
@@ -47,6 +48,7 @@ class Recognizer(Node):
         self._msg_id = 0
         if self._debug:
             self.get_logger().info(f'{self.get_name()} root is {root}')
+            self.get_logger().info(f'{self.get_name()} person classes is {person_classes}')
 
         encodings = Path(os.path.join(root, scenario, 'faces', "faces.pkl"))
         database = Path(os.path.join(root, scenario, 'faces', "faces.json"))
@@ -101,9 +103,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-
-    
-
-    
-
-
