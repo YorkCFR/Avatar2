@@ -1,3 +1,6 @@
+#
+# Do face recognition, and publish face information as detected
+#
 import os
 import sys
 import rclpy
@@ -6,6 +9,7 @@ import datetime
 import numpy as np
 import math
 import json
+import os
 from pathlib import Path
 from cv_bridge import CvBridge
 from rclpy.node import Node
@@ -21,28 +25,31 @@ from .FaceRecognizer import FaceRecognizer
 
 
 class Recognizer(Node):
-    def __init__(self, config_file = 'config.json'):
+    def __init__(self, root = 'scenario', scenario = 'hearing_clinic', config_file = 'config.json'):
         super().__init__('recognizer_node')
         self.get_logger().info(f'{self.get_name()} node created')
+        self.declare_parameter('root', config_file)
+        root = self.get_parameter('root').get_parameter_value().string_value
+        self.declare_parameter('scenario', scenario)
+        scenario = self.get_parameter('scenario').get_parameter_value().string_value
         self.declare_parameter('config_file', config_file)
         config_file = self.get_parameter('config_file').get_parameter_value().string_value
+        config_file = os.path.join(root, scenario, config_file)
         try:
             with open(config_file, 'r') as f:
                 config = json.load(f)
-        except:
-            self.get_logger().error(f'{self.get_name()} unable to open config_file {config_file}')
+        except Exception as e:
+            self.get_logger().error(f'{self.get_name()} unable to parse config_file {config_file} error {e}')
             sys.exit(1)
             
         try:
             self._debug = config['debug']
             self._face_topic = config['face_topic']   
             self._camera_topic = config['camera_topic']
-            root = config['root']
-            scenario = config['scenario']
             person_colasses = config['person_classes']
         
-        except:
-            self.get_logger().error(f'{self.get_name()} unable to get params from {config_file}')
+        except Exception as e:
+            self.get_logger().error(f'{self.get_name()} unable to get all params from {config_file} {e}')
             sys.exit(1)
 
         self._msg_id = 0

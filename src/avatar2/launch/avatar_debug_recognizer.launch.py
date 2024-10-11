@@ -21,8 +21,8 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
 
-    root = '/home/baranparsai/Documents/Avatar2/scenarios'   # default location of faces.json
-    scenario = 'hearing_clinic'
+    root = './scenarios'        # default location of scenarios
+    scenario = 'hearing_clinic' # default scenario
 
     for arg in sys.argv[4:]:
         if arg.startswith('scenario:='):
@@ -34,6 +34,7 @@ def generate_launch_description():
         else:
             print("Usage: launch avatar2 avatar_debug_recognizer.launch.py [root:=<root>] [scenario:=<scenario>] [debug:=True|False]")
             sys.exit()
+    root = os.path.abspath(root)
     config_file = os.path.join(root, scenario, 'config.json')
     print(f"Launching face recognition using config from {config_file}")
 
@@ -60,13 +61,13 @@ def generate_launch_description():
              name='head_detect',
              output='screen',
              namespace="/avatar2",
-             parameters=[{'config_file' : config_file}]),
+             parameters=[{'root' : root, 'scenario': scenario}]),
         Node(
              package='avatar2',
              executable='view_head_info',
              name='view_head_info',
              output='screen',
              namespace="/avatar2",
-             parameters=[{'config_file': config_file}]),
+             parameters=[{'root': root, 'scenario' : scenario}]),
     ])
 

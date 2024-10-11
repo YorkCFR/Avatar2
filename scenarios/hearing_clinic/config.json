@@ -1,6 +1,4 @@
 {
-    "root": "/home/jenkin/Documents/Avatar2/scenarios",
-    "scenario": "hearing_clinic",
     "camera_port": 0,
     "debug": false,
     "camera_topic": "/avatar2/avatar_camera/image_raw",
