@@ -74,10 +74,7 @@ class Recognizer(Node):
     
     def _camera_callback(self, data):
         img = self._bridge.imgmsg_to_cv2(data)
-
         bb, name, middle_row, middle_col = self._face_recognizer.recognize_faces(img)
-        #if self._debug:
-            #self.get_logger().info(f'{self.get_name()} bounding_box {bb} name is {name}')
 
         if bb is not None:
             sub = img[bb[0]:bb[2], bb[3]:bb[1],:]

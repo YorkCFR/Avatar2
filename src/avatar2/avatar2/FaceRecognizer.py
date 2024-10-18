@@ -128,7 +128,8 @@ class FaceRecognizer:
         
         self._print(f"largest box is {largest_face_area}")
         id = -1
-        name = {'name': 'unknown', 'ID': -1, 'role': 'unknown'}
+#        name = {'name': 'unknown', 'ID': -1, 'role': 'unknown'}
+        name = {'first_name': 'unknown', 'last_name': 'unknown', 'ID': -1, 'role': 'unknown'}
 
         if largest_face_area > 0:
             id = self._recognize_face(unknown_encoding, self._loaded_encodings)
