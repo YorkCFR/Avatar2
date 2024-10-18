@@ -1,9 +1,13 @@
+#
+# A bit of debugging code to show what the face recognizer got back
+#
 import math
 import numpy as np
 import rclpy
 from rclpy.node import Node
 from rclpy.parameter import Parameter
 import cv2
+import json
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
 from avatar2_interfaces.msg import SpeakerInfo
@@ -22,12 +26,24 @@ class ViewCamera(Node):
         self._bridge = CvBridge()
 
     def _face_callback(self, msg):
-        self.get_logger().info(f'{self.get_name()} recovered face {msg.row} {msg.col}')
         face = self._bridge.imgmsg_to_cv2(msg.face, "bgr8")
    
-        self.get_logger().info(f'{self.get_name()} got back an image row {msg.row} col {msg.col} width {msg.width} height {msg.height}')
+        height = face.shape[0]
+        width = face.shape[1]
+        first_name = "Unknown"
+        last_name = "Unknown"
+        role = "Unknown"
+        try :
+            data = json.loads(msg.info.data)
+            first_name = data['first_name']
+            last_name = data['last_name']
+            role = data['role']
+        except Exception as e:
+            pass
+        cv2.rectangle(face, (int(width*(msg.col-msg.width/2)), int(height*(msg.row-msg.height/2))), (int(width*(msg.col+msg.width/2)), int(height*(msg.row+msg.height/2))), (0,0,255), 2)
+        cv2.putText(face, first_name + " " + last_name, (int(width*(msg.col-msg.width/2) - 10), int(height*(msg.row+msg.height/2)+25)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, 2)
         cv2.imshow('face', face)
-        cv2.waitKey(3)
+        cv2.waitKey(1)
 
 def main(args=None):
     rclpy.init(args=args)
