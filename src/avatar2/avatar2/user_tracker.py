@@ -10,6 +10,7 @@
 # first_name ::= last name as a string (only valid for Starting)
 # last_name ::= last name as a string (only valid for Starting)
 # role ::= role of the person (only valid for starting)
+# proxemics ::= "intimate" | "personal" | "social" |  "public" 
 # 
 #
 import os
@@ -46,7 +47,11 @@ class ConversationTrackerNode(Node):
             self._tracker_topic = config['tracker_topic']
             self._conversation_timeout = config['conversation_timeout']   # if the tracked face does not appear for this long, end this conversation
             self._new_person_threshold = config['new_person_threshold']   # how long to continue the conversation if a new person is seen
-        except Excetpion as e:
+            self._intimate = config['intimate']
+            self._personal = config['personal']
+            self._social = config['social']
+            self.get_logger().info(f'{self.get_name()}  proxemics issues {self._personal} {self._social}')
+        except Exception as e:
             self.get_logger().error(f'{self.get_name()} unable to get params from {config_file} error {e}')
             sys.exit(1)
             
@@ -115,9 +120,18 @@ class ConversationTrackerNode(Node):
         convo_info.audio_sequence_number = msg.seq # match the sequence number of face detection
         self._msg_id = msg.seq
         message = {}
+        area = msg.width * msg.height
+        if area >= self._intimate:
+            proxemics = "intimate"
+        elif area >= self._personal:
+            proxemics = "personal"
+        elif area >= self._social:
+            proxemics = "social"
+        else:
+            proxemics = "public"
+        self.get_logger().info(f"{self.get_name()} area {area} proxemics {proxemics}")
         
         if self._current_speaker is None: # We have no curent speaker to consider
-            self.get_logger().info(f"{self.get_name()} starting conversation with new person {msg.info.data}")
             if self._debug:
                 self.get_logger().info(f"{self.get_name()} starting conversation with new person {speaker_info['ID']}")
             self._current_speaker = speaker_info
@@ -130,6 +144,8 @@ class ConversationTrackerNode(Node):
             message['role']= speaker_info['role']
             message['ID'] = speaker_info['ID']
             message['time'] = "0.00"
+            message['area'] = area
+            message['proxemics'] = proxemics
             convo_info.text.data = json.dumps(message)
         elif self._current_speaker['ID'] == speaker_info['ID']: # detected the person we are talking too (all unknown are the same!)
             if self._debug:
@@ -143,6 +159,8 @@ class ConversationTrackerNode(Node):
             message['role']= speaker_info['role']
             message['ID'] = speaker_info['ID']
             message['time'] = str(round(self._detection_duration, 2))
+            message['area'] = area
+            message['proxemics'] = proxemics
             convo_info.text.data = json.dumps(message)
         else: # detected someone else
             if self._debug:

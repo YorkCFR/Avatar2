@@ -21,5 +21,8 @@
     "in_control_topic": "/avatar2/in_control_message",
     "tracker_topic": "/avatar2/user_info",
     "conversation_timeout": 5,
-    "new_person_threshold": 1
+    "new_person_threshold": 1,
+    "intimate": 0.11,
+    "personal" : 0.05,
+    "social" : 0.02
 }

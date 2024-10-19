@@ -113,18 +113,18 @@ class FaceRecognizer:
                 largest_face_area = face_area
                 largest_face_location = bounding_box
 
-                # Calculate distance using depth estimation
-                face_width_pixels = right - left
-                face_height_pixels = bottom - top
+#                # Calculate distance using depth estimation
+#                face_width_pixels = right - left
+#                face_height_pixels = bottom - top
                 
-                # Estimate distance using depth estimation formula
-                distance = self.estimate_distance(face_width_pixels, focal_length, sensor_height)
+#                # Estimate distance using depth estimation formula
+#                distance = self.estimate_distance(face_width_pixels, focal_length, sensor_height)
                 
-                # Ignore faces beyond 1 meter
-                if distance and distance > 100:  # Assuming distance is in centimeters
-                    largest_face_location = None
-                    distance = None
-                    continue
+#                # Ignore faces beyond 1 meter
+#                if distance and distance > 100:  # Assuming distance is in centimeters
+#                    largest_face_location = None
+#                    distance = None
+#                    continue
         
         self._print(f"largest box is {largest_face_area}")
         id = -1
@@ -139,14 +139,14 @@ class FaceRecognizer:
                 name = self._database[id]
         return largest_face_location, name, middle_row, middle_col
     
-    def estimate_distance(self, face_width_pixels, focal_length, sensor_height):
-        """Estimate distance using the depth estimation formula."""
-        real_face_width_mm = 160
-        distance_mm = (real_face_width_mm * focal_length) / face_width_pixels
-        distance_cm = distance_mm / 10
-        self._print(f'distance from the camera is {distance_cm} cm')
-
-        return distance_cm
+#    def estimate_distance(self, face_width_pixels, focal_length, sensor_height):
+#        """Estimate distance using the depth estimation formula."""
+#        real_face_width_mm = 160
+#        distance_mm = (real_face_width_mm * focal_length) / face_width_pixels
+#        distance_cm = distance_mm / 10
+#        self._print(f'distance from the camera is {distance_cm} cm')
+#
+#        return distance_cm
     
     def _recognize_face(self, unknown_encoding, loaded_encodings):
         """Recognize the face by comparing its encoding with loaded encodings.
