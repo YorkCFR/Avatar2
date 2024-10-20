@@ -18,8 +18,8 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='walleed',
-    maintainer_email='walleed@todo.todo',
-    description='TODO',
+    maintainer_email='walleed@yorku.ca',
+    description='A ROS-based avatar for HRI',
     license='MIT license',
     tests_require=['pytest'],
     entry_points={
@@ -28,9 +28,11 @@ setup(
             'avatar_camera_view = avatar2.view_camera:main',            # display raw video (debug)
             'head_detect = avatar2.recognizer:main',                    # do head detection
             'view_head_info = avatar2.view_face:main',                  # display head detection output (debug)
+            'user_tracker = avatar2.user_tracker:main',                 # do user tracking
+            'user_monitor = avatar2.user_monitor:main',                 # report results of user monitoring (debug)
             'sound_capture = avatar2.audio_input:main',			# capture audio from a microphone
-            'sound_play = avatar2.audio_input_wav:main',		# play a wav file
-            'sound_dump = avatar2.audio_dump:main',			# dump audio file
+            'sound_play = avatar2.audio_input_wav:main',		# play a wav file (debug)
+            'sound_dump = avatar2.audio_dump:main',			# dump audio file (debug)
             'sound_to_text = avatar2.audio_to_text:main',		# convert audio to text
             'play_text = avatar2.play_text:main',			# convert text to wav
             'text_to_sound = avatar2.text_to_audio:main',
@@ -40,7 +42,6 @@ setup(
             'ros_avatar = avatar2.ros_avatar:main',
             'llm_only = avatar2.llm_only:main',
             'sentiment_analysis = avatar2.sentiment_analysis:main',
-            'user_tracker = avatar2.user_tracker:main'
         ],
     },
 )

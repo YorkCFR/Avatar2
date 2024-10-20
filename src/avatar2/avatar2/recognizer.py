@@ -73,6 +73,7 @@ class Recognizer(Node):
         
     
     def _camera_callback(self, data):
+        """Deal with camera message"""
         img = self._bridge.imgmsg_to_cv2(data)
         bb, name, middle_row, middle_col = self._face_recognizer.recognize_faces(img)
 

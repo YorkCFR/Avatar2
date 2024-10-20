@@ -58,5 +58,11 @@ def generate_launch_description():
              output='screen',
              namespace="/avatar2",
              parameters=[{'root' : root, 'scenario': scenario}]),
+        Node(
+             package='avatar2',
+             executable='user_monitor',
+             name='user_monitor',
+             output='screen',
+             namespace="/avatar2"),
     ])
 
