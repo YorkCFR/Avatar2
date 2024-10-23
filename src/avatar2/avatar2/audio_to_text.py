@@ -36,7 +36,6 @@ class Audio2TextNode(Node):
         self._listening = True
         self._listening_time = self.get_clock().now().nanoseconds
 
-        self._debug = True
         if self._debug:
             self.get_logger().info(f"{self.get_name()} Time {self._listening_time}")
             self.get_logger().info(f"{self.get_name()} publishing to {message}")
@@ -80,10 +79,10 @@ def main(args=None):
     node = Audio2TextNode()
     try:
         rclpy.spin(node)
+        node.destroy_node()
     except KeyboardInterrupt:
         pass
 
-    node.destroy_node()
 
 if __name__ == '__main__':
     main()
