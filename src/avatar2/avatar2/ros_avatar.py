@@ -1,3 +1,6 @@
+#
+# This is a very simple animation that plays an utternace
+#
 import rclpy
 from rclpy.node import Node
 from avatar2_interfaces.msg import Audio
@@ -60,6 +63,14 @@ class ROSAvatar(Node):
                 self._play = None
                 self._req.listen = True
                 self._cli.call_async(self._req)  # ignore return value
+            else:
+                if self._debug:
+                    self.get_logger().info(f'{self.get_name()} sound is not finished')
+        else:
+            if self._debug:
+                self.get_logger().info(f'{self.get_name()} reminding all that I am ready to play something')
+            self._req.listen = True
+            self._cli.call_async(self._req)  # ignore return value
 
         self._frameid = (self._frameid + 1) % self._nframes
         if self._play is None:

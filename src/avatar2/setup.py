@@ -37,8 +37,7 @@ setup(
             'play_text = avatar2.play_text:main',			# convert text to wav
             'text_to_sound = avatar2.text_to_audio:main',               # convert text to sound
             'text_dump = avatar2.text_dump:main',                       # dump a tagged string to the log (debug)
-            'play_text_syncd = avatar2.play_text_syncd:main',
-            'play_audio_syncd = avatar2.play_audio_syncd:main',
+            'play_text_syncd = avatar2.play_text_syncd:main',           # play text sync'd to an avatar
             'llm_engine = avatar2.llm_engine:main',
             'ros_avatar = avatar2.ros_avatar:main',
             'llm_only = avatar2.llm_only:main',

@@ -1,3 +1,6 @@
+#
+# Convert text to audio
+#
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
@@ -23,6 +26,8 @@ class Text2AudioNode(Node):
         site_path = self.get_parameter('site_path').get_parameter_value().string_value
         self.declare_parameter('model', "tts_models/en/ljspeech/tacotron2-DDC") # voice model to use
         model = self.get_parameter('model').get_parameter_value().string_value
+        self.declare_parameter('debug', False)
+        self._debug = self.get_parameter('debug').get_parameter_value().bool_value
 
         # do all that is needed to fire up TTS
         model_manager = ModelManager(site_path)
@@ -33,13 +38,16 @@ class Text2AudioNode(Node):
 
         self.create_subscription(TaggedString, message, self._callback, QoSProfile(depth=1))
         self._publisher = self.create_publisher(Audio, audio, QoSProfile(depth=1))
+        self.get_logger().info(f'Running with debug {self._debug}')
 
     def _callback(self, data):
-        self.get_logger().info(f'{self.get_name()} about to say |{data.text.data}|')
+        if self._debug:
+            self.get_logger().info(f'{self.get_name()} about to say |{data.text.data}|')
         out = self._syn.tts(data.text.data)
         fp = tempfile.NamedTemporaryFile(delete=False,suffix=".wav")
         fp.close()
-        self.get_logger().info(f'{self.get_name()} saving to {fp.name}')
+        if self._debug:
+            self.get_logger().info(f'{self.get_name()} saving to {fp.name}')
         self._syn.save_wav(out, fp.name)
         with open(fp.name, "rb") as f:
             audio_data = f.read()
