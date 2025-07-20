@@ -25,10 +25,15 @@ def generate_launch_description():
              parameters=[{'non_speaking_duration': 1.0, 'pause_threshold': 1.0, 'debug': True}]),
         Node(
              package='avatar2',
+             executable='sentiment_analysis',
+             name='sentiment_analysis',
+             output='screen'),
+        Node(
+             package='avatar2',
              executable='sound_to_text',
              name='sound_to_text',
              output='screen',
-             parameters=[{'debug': True}]),
+             parameters=[{'debug': False}]),
         Node(
              package='avatar2',
              executable='text_dump',

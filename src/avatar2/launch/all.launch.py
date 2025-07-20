@@ -10,27 +10,34 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    root = '/home/walleed/Avatar2/scenarios'   # default location of faces.json
+    root = '/home/jenkin/Documents/avatar/Avatar2/scenarios'   # default location of faces.json
     scenario = 'hearing_clinic'
-    config_file = os.path.join(root, scenario, 'config.json')
+    config_file = os.path.join(root, scenario, 'config.json') # config file is fully qualified path
     debug = False
-    ui_imagery = '/home/walleed/Avatar2/ros_avatar'   # default imagery location
+    ui_imagery = '/home/jenkin/Documents/avatar/Avatar2/ros_avatar'   # default imagery location
     ros_ui = False
 
     for arg in sys.argv[4:]:
         if arg.startswith('scenario:='):
             scenario = arg.split('scenario:=', 1)[1]
             print(f"Launching with scenario as {scenario}")
+        elif arg.startswith('root:='):
+            root = arg.split('root:=', 1)[1]
+            print(f"Launching with root as {root}")
         elif arg.startswith('ros_ui'):
-            print(f"Launching with debug is {arg.split('ros_ui:=', 1)[1]}")
+            print(f"Launching with ros_ui is {arg.split('ros_ui:=', 1)[1]}")
             ros_ui = bool(arg.split('ros_ui:=', 1)[1])
             print(f'Launching with ros_ui as {ros_ui}')
+        elif arg.startswith('debug'):
+            print(f"Launching with debug is {arg.split('debug:=', 1)[1]}")
+            debug = bool(arg.split('debug:=', 1)[1])
+            print(f'Launching with debug as {debug}')
         elif arg.startswith('ui_imagery:='):
            print(arg.split('ui_imagery:=', 1)[1])
            ui_imagery = arg.split('ui_imagery:=', 1)[1]
            print(f"Launching with imagery at {ui_imagery}")
         else:
-            print("Usage: launch avatar2 all.launch.py [root:=<root>] [scenario:=<scenario>] [ui_imagery:=<ui_imagery_root>] [ros_ui:= False|True]")
+            print("Usage: launch avatar2 all.launch.py [root:=<root>] [scenario:=<scenario>] [ui_imagery:=<ui_imagery_root>] [ros_ui:= False|True] [debug:=False|True")
             sys.exit()
     config_file = os.path.join(root, scenario, 'config.json')
     print(f"using config form {config_file}")
@@ -55,7 +62,7 @@ def generate_launch_description():
              name='sound_capture',
              output='screen',
              namespace="/avatar2",
-             parameters=[{'non_speaking_duration': 1.0, 'pause_threshold': 1.0}])
+             parameters=[{'non_speaking_duration': 1.0, 'pause_threshold': 1.0, 'debug' : False}])
     nodes.append(microphone_node)
 
     sound_to_text_node = Node(
@@ -63,15 +70,25 @@ def generate_launch_description():
              executable='sound_to_text',
              name='sound_to_text',
              output='screen',
-             namespace="/avatar2")
+             namespace="/avatar2",
+             parameters=[{'debug' : True}])
     nodes.append(sound_to_text_node)
+
+    sentiment_node = Node(
+             package='avatar2',
+             executable='sentiment_analysis',
+             name='analysis',
+             output='screen',
+             namespace="/avatar2")
+    nodes.append(sentiment_node)
 
     text_to_sound = Node(
              package='avatar2',
              executable='text_to_sound',
              name='text_to_sound',
              output='screen',
-             namespace="/avatar2")
+             namespace="/avatar2",
+             parameters=[{'debug' : False}])
     nodes.append(text_to_sound)
 
     camera_node = Node(
@@ -80,7 +97,7 @@ def generate_launch_description():
             name='avatar_camera',
             output='screen',
             namespace="/avatar2",
-            parameters=[{'port': config['camera_port']}])
+            parameters=[{'port': config['camera_port'], 'debug' : False}])
     nodes.append(camera_node)
 
     face_recognizer_node = Node(
@@ -89,7 +106,7 @@ def generate_launch_description():
             name='head_detect',
             output='screen',
             namespace="/avatar2",
-            parameters=[{'config_file': config_file}])
+            parameters=[{'root' : root, 'scenario': scenario, 'debug' : False}])
     nodes.append(face_recognizer_node)
         
     llm_hermes_clinic_node = Node(
@@ -98,7 +115,7 @@ def generate_launch_description():
             name='llm_engine',
             output='screen',
             namespace="/avatar2",
-            parameters=[{'config_file': config_file}])
+            parameters=[{'root' : root, 'scenario': scenario, 'config_file': config_file, 'debug' : True}])
     nodes.append(llm_hermes_clinic_node)
     
     user_tracker_node = Node(
@@ -107,7 +124,7 @@ def generate_launch_description():
             name='user_tracker',
             output='screen',
             namespace="/avatar2",
-            parameters=[{'config_file': config_file}])
+            parameters=[{'config_file': config_file, 'debug' : False}])
     nodes.append(user_tracker_node)
 
     rosbridge_node = Node(
@@ -124,7 +141,7 @@ def generate_launch_description():
              executable='ros_avatar',
              name='ros_avatar',
              output='screen',
-             parameters=[{'imagery': ui_imagery, 'debug': debug}])
+             parameters=[{'imagery': ui_imagery, 'debug': False}])
         nodes.append(ros_node)
 
     return LaunchDescription(nodes)

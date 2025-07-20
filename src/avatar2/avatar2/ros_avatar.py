@@ -49,11 +49,18 @@ class ROSAvatar(Node):
 
         self._play = None
         self._req.listen = True
-        self._cli.call_async(self._req)  # ignore return value
+        self._cli.call_async(self._req).add_done_callback(self._process_response)
         self._text = ""
 
         self._subscriber = self.create_subscription(Audio, self._topic, self._callback, 1)
         self.create_timer(0.1, self._timer_callback)
+
+    def _process_response(self, future):
+        response = future.result()
+        if response is None:
+            self.get_logger().info(f'{self.get_name()} No response (every) on first call to enable listening')
+        else:
+            self.get_logger().info(f'{self.get_name()} got back {response.status} on first call to enable listening')
 
     def _timer_callback(self):
         if self._play is not None:
@@ -114,6 +121,7 @@ class ROSAvatar(Node):
             if self._debug:
                 self.get_logger().info(f'{self.get_name()} got an unknown sound format {data.format}')
             return
+        self.get_logger().info(f'{self.get_name()} starting to play and disable listening')
         self._req.listen = False
         self._cli.call_async(self._req)  # ignore return value
         self._text = data.text.data

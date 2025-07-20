@@ -43,9 +43,11 @@ class Audio2TextNode(Node):
     def _listener_callback(self, msg, resp):
         """Deal with service call to set listening status"""
         if self._debug:
-            self.get_logger().info(f"{self.get_name()} Setting listening status to {msg.listen}")
-        if msg.listen:
-            self._listening_time = self.get_clock().now().nanoseconds
+            if self._listening != msg.listen:
+                if self._debug:
+                    self.get_logger().info(f"{self.get_name()} Changing listening status from {self._listening} to {msg.listen}")
+                if msg.listen:
+                    self._listening_time = self.get_clock().now().nanoseconds
         self._listening = msg.listen
         resp.status = self._listening
         return resp
@@ -62,9 +64,10 @@ class Audio2TextNode(Node):
         # Replace the non-ascii characters with spaces
         result['text'] = ''.join([char if char.isascii() else ' ' for char in result['text']])
         
-        if (not self._listening) or (self.get_clock().now().nanoseconds < self._listening_time + 4 * 1e9):
+        if (not self._listening) or (self.get_clock().now().nanoseconds < self._listening_time + 2 * 1e9):
             if self._debug:
-                self.get_logger().info(f"{self.get_name()} Not listening to message sequence number {data.seq} |{result['text']}|")
+                self.get_logger().info(f"{self.get_name()} Not listening (listening is {self._listening}) to message sequence number {data.seq} |{result['text']}|")
+                self.get_logger().info(f"{self.get_name()} Not listening (listening is {self._listening}) Time diff is {(self.get_clock().now().nanoseconds - self._listening_time) /1e9}")
             return
         if self._debug:
             self.get_logger().info(f"{self.get_name()} Listening to message sequence number {data.seq} |{result['text']}|")

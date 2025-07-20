@@ -43,10 +43,10 @@ class Recognizer(Node):
             sys.exit(1)
             
         try:
-            self._debug = config['debug']
+            self._debug = config.get('debug', True)
             self._face_topic = config['face_topic']   
             self._camera_topic = config['camera_topic']
-            person_colasses = config['person_classes']
+            person_classes = config['person_classes']
         
         except Exception as e:
             self.get_logger().error(f'{self.get_name()} unable to get all params from {config_file} {e}')

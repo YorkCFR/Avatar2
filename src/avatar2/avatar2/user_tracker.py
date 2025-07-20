@@ -42,7 +42,7 @@ class ConversationTrackerNode(Node):
             sys.exit(1)
 
         try:
-            self._debug = config['debug']
+            self._debug = config.get('debug', True)
             self._face_topic = config['face_topic']
             self._tracker_topic = config['tracker_topic']
             self._conversation_timeout = config['conversation_timeout']   # if the tracked face does not appear for this long, end this conversation

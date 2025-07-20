@@ -1,6 +1,5 @@
 {
     "camera_port": 0,
-    "debug": false,
     "camera_topic": "/avatar2/avatar_camera/image_raw",
     "person_classes" : [ "owner", "employee", "patient", "unknown" ],
     "out_topic": "/avatar2/out_message",

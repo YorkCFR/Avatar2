@@ -1,0 +1,96 @@
+query, response, timestamp (time taken to generate/update the response), count, entry time, current time of logging, time difference
+bluebell, Default response for bluebell, 1753036249.1203957, 0, 1753036249.1204011, 1753036249.1205323, 0.00013113021850585938, True
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753036249.1207154, 0, 2025-07-20 14:30:49.120716, 1753036249.120836, 0.00011968612670898438, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753037975.412872, 0, 2025-07-20 14:59:35.412877, 1753037975.4130082, 0.0001316070556640625, True 
+bluebell, Default response for bluebell, 1753037975.413183, 0, 2025-07-20 14:59:35.413184, 1753037975.413302, 0.00011801719665527344, True 
+bluebell, Default response for bluebell, 1753038623.7358515, 0, 2025-07-20 15:10:23.735856, 1753038623.7359848, 0.0001289844512939453, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753038623.7361543, 0, 2025-07-20 15:10:23.736156, 1753038623.7362757, 0.00011992454528808594, True 
+bluebell, Default response for bluebell, 1753038716.463228, 0, 2025-07-20 15:11:56.463233, 1753038716.4633632, 0.0001304149627685547, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753038716.4635336, 0, 2025-07-20 15:11:56.463535, 1753038716.4636562, 0.00012159347534179688, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753038855.696914, 0, 2025-07-20 15:14:15.696918, 1753038855.6970472, 0.0001289844512939453, True 
+bluebell, Default response for bluebell, 1753038855.6972215, 0, 2025-07-20 15:14:15.697223, 1753038855.6973407, 0.00011777877807617188, True 
+bluebell, Default response for bluebell, 1753038898.063737, 0, 2025-07-20 15:14:58.063741, 1753038898.0638692, 0.0001285076141357422, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753038898.0640414, 0, 2025-07-20 15:14:58.064043, 1753038898.0641658, 0.0001232624053955078, True 
+bluebell, Default response for bluebell, 1753038936.3612041, 0, 2025-07-20 15:15:36.361209, 1753038936.3613467, 0.00013780593872070312, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753038936.3615265, 0, 2025-07-20 15:15:36.361528, 1753038936.3616467, 0.00011849403381347656, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753039303.2927673, 0, 2025-07-20 15:21:43.292772, 1753039303.2929149, 0.00014328956604003906, True 
+bluebell, Default response for bluebell, 1753039303.2930908, 0, 2025-07-20 15:21:43.293092, 1753039303.293225, 0.00013327598571777344, True 
+bluebell, Default response for bluebell, 1753039533.8724961, 0, 2025-07-20 15:25:33.872604, 1753039533.8728611, 0.0002567768096923828, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753039533.8730536, 0, 2025-07-20 15:25:33.873055, 1753039533.873178, 0.00012350082397460938, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753039595.9477785, 0, 2025-07-20 15:26:35.947783, 1753039595.9479163, 0.00013303756713867188, True 
+bluebell, Default response for bluebell, 1753039595.948095, 0, 2025-07-20 15:26:35.948096, 1753039595.9482205, 0.00012445449829101562, True 
+bluebell, Default response for bluebell, 1753039853.8282812, 0, 2025-07-20 15:30:53.828285, 1753039853.8284156, 0.00013017654418945312, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753039853.8285902, 0, 2025-07-20 15:30:53.828591, 1753039853.8287113, 0.00011992454528808594, True 
+what is your name,  My name is Mary. I'm here to assist you with any questions or information about Exquisite Hearing Clinic and its staff, including Penny Alexopoulos., 28.756902433, 0, 2025-07-20 15:31:29.065480, 1753039889.065942, 0.0004622936248779297, False 
+hmm what did you get as an output,  I'm not sure what specific output you are referring to. Can you please provide more context or details about the output you are asking about?, 23.987365926, 0, 2025-07-20 15:31:53.054654, 1753039913.0550685, 0.0004143714904785156, False 
+where are we,  You are currently at the Exquisite Hearing Clinic. We are located at 22 Richmond Street, Unit 101, Richmond Hill, Ontario, L4C 3Y1. Our phone number is (905) 884-4327 and our email address is exquisitehearingclinic@gmail.com. We are open from Monday to Friday at 9am till 5 pm, with evening and weekend appointments also available., 27.45951397, 0, 2025-07-20 15:32:20.515902, 1753039940.5163162, 0.0004143714904785156, False 
+how do you get to york university,  I'm not sure., 22.581972818, 0, 2025-07-20 15:32:43.099635, 1753039963.1000571, 0.00042176246643066406, False 
+hvil er mig,  Jeg er ikke sikker., 25.553079605, 0, 2025-07-20 15:33:29.971238, 1753040009.9716508, 0.0004127025604248047, False 
+,  Hi there! My name is Mary. I'm happy to help you with any questions or information about the Exquisite Hearing Clinic in Richmond Hill. Do you have a specific question or concern?, 25.862834708, 0, 2025-07-20 15:33:55.835799, 1753040035.8362145, 0.00041556358337402344, False 
+thank you,  You're welcome! If there's anything else I can help you with, feel free to ask. My name is Mary from the Exquisite Hearing Clinic., 28.764869935, 0, 2025-07-20 15:34:24.602425, 1753040064.6028495, 0.0004241466522216797, False 
+when is my appointment,  I'm not sure when your appointment is, but please check the confirmation email or contact our clinic to confirm the details., 26.991735789, 0, 2025-07-20 15:34:51.596011, 1753040091.596806, 0.0007951259613037109, False 
+where is the clinic located,  The Exquisite Hearing Clinic is located at 22 Richmond Street, Unit 101, Richmond Hill, Ontario, L4C 3Y1., 33.7725811, 0, 2025-07-20 15:35:25.372103, 1753040125.3725293, 0.00042629241943359375, False 
+,  Hi there! My name is Mary. I'm happy to help you with any questions or information about the Exquisite Hearing Clinic in Richmond Hill. Do you have a specific question or concern?, 0.00013494491577148438, 1, 2025-07-20 15:35:25.373720, 1753040125.374222, 0.0005016326904296875, True 
+what is the capital of ontario,  I'm not sure. The question seems unrelated to the context provided about hearing and hearing clinics. The capital of Ontario is Toronto., 23.226987967, 0, 2025-07-20 15:36:07.050816, 1753040167.0512822, 0.0004665851593017578, False 
+,  Hi there! My name is Mary. I'm happy to help you with any questions or information about the Exquisite Hearing Clinic in Richmond Hill. Do you have a specific question or concern?, 0.0001423358917236328, 2, 2025-07-20 15:36:07.052709, 1753040167.053179, 0.0004699230194091797, True 
+am i unhappy,  I'm not sure how you feel, Mary. Please provide more context or ask a different question., 22.05724423, 0, 2025-07-20 15:36:53.864556, 1753040213.8649845, 0.00042819976806640625, False 
+,  Hi there! My name is Mary. I'm happy to help you with any questions or information about the Exquisite Hearing Clinic in Richmond Hill. Do you have a specific question or concern?, 0.000125885009765625, 3, 2025-07-20 15:36:53.866110, 1753040213.8666222, 0.0005123615264892578, True 
+,  Hi there! My name is Mary. I'm happy to help you with any questions or information about the Exquisite Hearing Clinic in Richmond Hill. Do you have a specific question or concern?, 0.0001327991485595703, 4, 2025-07-20 15:37:15.708306, 1753040235.7088215, 0.0005159378051757812, True 
+bluebell, Default response for bluebell, 1753040265.3412058, 0, 2025-07-20 15:37:45.341208, 1753040265.3413398, 0.0001316070556640625, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753040265.3415165, 0, 2025-07-20 15:37:45.341518, 1753040265.3416395, 0.00012183189392089844, True 
+,  Hi there! My name is Mary. I'm happy to help you with any questions or information about the Exquisite Hearing Clinic in Richmond Hill. Is there something specific you would like to know?, 27.686846912, 0, 2025-07-20 15:38:33.691849, 1753040313.6922576, 0.0004086494445800781, False 
+what is your name,  My name is Mary. I'm here to assist you with any questions or information about Exquisite Hearing Clinic and its staff, including Penny Alexopoulos., 15.746022272, 0, 2025-07-20 15:38:49.439715, 1753040329.440109, 0.0003936290740966797, False 
+i got that twice for some reason,  Apologies for the duplicate message, Zoey. If you have any questions or need further assistance, please feel free to ask., 26.348189924, 0, 2025-07-20 15:39:32.845682, 1753040372.846069, 0.0003871917724609375, False 
+,  Hi there! My name is Mary. I'm happy to help you with any questions or information about the Exquisite Hearing Clinic in Richmond Hill. Is there something specific you would like to know?, 0.0002231597900390625, 1, 2025-07-20 15:39:32.847475, 1753040372.848397, 0.0009217262268066406, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753040493.2228224, 0, 2025-07-20 15:41:33.222827, 1753040493.2229571, 0.0001304149627685547, True 
+bluebell, Default response for bluebell, 1753040493.223135, 0, 2025-07-20 15:41:33.223136, 1753040493.2232559, 0.00011992454528808594, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753040858.0216703, 0, 2025-07-20 15:47:38.021674, 1753040858.0218036, 0.00012922286987304688, True 
+bluebell, Default response for bluebell, 1753040858.0219796, 0, 2025-07-20 15:47:38.021981, 1753040858.0221026, 0.00012159347534179688, True 
+bluebell, Default response for bluebell, 1753041291.1585214, 0, 2025-07-20 15:54:51.158525, 1753041291.1586547, 0.00012922286987304688, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753041291.158819, 0, 2025-07-20 15:54:51.158820, 1753041291.1589382, 0.00011801719665527344, True 
+,  Hi there! My name is Mary. I'm happy to help you with any questions or information about the Exquisite Hearing Clinic in Richmond Hill. Is there something specific you would like to know?, 25.61848061, 0, 2025-07-20 15:55:27.613515, 1753041327.613955, 0.00044035911560058594, False 
+,  Hi there! My name is Mary. I'm happy to help you with any questions or information about the Exquisite Hearing Clinic in Richmond Hill. Is there something specific you would like to know?, 0.00015401840209960938, 1, 2025-07-20 15:55:47.161372, 1753041347.1618822, 0.0005104541778564453, True 
+,  Hi there! My name is Mary. I'm happy to help you with any questions or information about the Exquisite Hearing Clinic in Richmond Hill. Is there something specific you would like to know?, 0.00013589859008789062, 2, 2025-07-20 15:56:28.841188, 1753041388.8416731, 0.0004849433898925781, True 
+,  Hi there! My name is Mary. I'm happy to help you with any questions or information about the Exquisite Hearing Clinic in Richmond Hill. Is there something specific you would like to know?, 0.0002865791320800781, 3, 2025-07-20 15:57:09.450353, 1753041429.4514368, 0.0010836124420166016, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753041480.2157156, 0, 2025-07-20 15:58:00.215732, 1753041480.2158766, 0.00014495849609375, True 
+bluebell, Default response for bluebell, 1753041480.2160835, 0, 2025-07-20 15:58:00.216085, 1753041480.2162087, 0.00012350082397460938, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753041534.9188762, 0, 2025-07-20 15:58:54.918881, 1753041534.919016, 0.00013518333435058594, True 
+bluebell, Default response for bluebell, 1753041534.9191828, 0, 2025-07-20 15:58:54.919184, 1753041534.9193046, 0.00012040138244628906, True 
+,  Hi there! My name is Mary. I'm happy to help you with any questions or information about the Exquisite Hearing Clinic in Richmond Hill. Is there something specific you would like to know?, 28.17108308, 0, 2025-07-20 15:59:26.929833, 1753041566.9302225, 0.00038933753967285156, False 
+,  Hi there! My name is Mary. I'm happy to help you with any questions or information about the Exquisite Hearing Clinic in Richmond Hill. Is there something specific you would like to know?, 0.0001304149627685547, 1, 2025-07-20 15:59:26.931419, 1753041566.931894, 0.0004749298095703125, True 
+fuck off,  I'm sorry if I offended you, Mary. Is there anything related to the Exquisite Hearing Clinic or Penny Alexopoulos that you need help with?, 13.641430172, 0, 2025-07-20 16:00:40.338861, 1753041640.3392656, 0.00040459632873535156, False 
+,  Hi there! My name is Mary. I'm happy to help you with any questions or information about the Exquisite Hearing Clinic in Richmond Hill. Is there something specific you would like to know?, 0.00016498565673828125, 2, 2025-07-20 16:01:05.144852, 1753041665.145391, 0.0005385875701904297, True 
+bluebell, Default response for bluebell, 1753041776.8455667, 0, 2025-07-20 16:02:56.845571, 1753041776.845704, 0.00013303756713867188, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753041776.8458922, 0, 2025-07-20 16:02:56.845893, 1753041776.8460143, 0.00012111663818359375, True 
+,  Hi there! My name is Mary. I'm happy to help you with any questions or information about the Exquisite Hearing Clinic in Richmond Hill. Do you have a specific question or concern?, 25.674319758, 0, 2025-07-20 16:04:09.763386, 1753041849.7641401, 0.0007543563842773438, False 
+what is your name,  My name is Mary. I'm here to assist you with any questions or information about Exquisite Hearing Clinic and its staff, including Penny Alexopoulos., 15.021118255, 0, 2025-07-20 16:04:24.787790, 1753041864.7882366, 0.000446319580078125, False 
+what is your name,  My name is Mary. I'm here to assist you with any questions or information about Exquisite Hearing Clinic and its staff, including Penny Alexopoulos., 0.0001614093780517578, 1, 2025-07-20 16:04:39.735761, 1753041879.7362504, 0.0004892349243164062, True 
+how warm is it today,  I'm not sure., 21.278692932, 0, 2025-07-20 16:05:16.988460, 1753041916.9888856, 0.0004260540008544922, False 
+how warm is it today,  I'm not sure., 0.00014400482177734375, 1, 2025-07-20 16:05:22.972981, 1753041922.973457, 0.0004756450653076172, True 
+,  Hi there! My name is Mary. I'm happy to help you with any questions or information about the Exquisite Hearing Clinic in Richmond Hill. Do you have a specific question or concern?, 0.00013875961303710938, 1, 2025-07-20 16:05:49.608242, 1753041949.6087525, 0.0005109310150146484, True 
+i love you,  Thank you, Mary! It's great to hear that. If you have any questions about the Exquisite Hearing Clinic or hearing aids, feel free to ask., 22.337026823, 0, 2025-07-20 16:06:30.670682, 1753041990.671071, 0.00038909912109375, False 
+bluebell, Default response for bluebell, 1753042074.1199899, 0, 2025-07-20 16:07:54.119994, 1753042074.1201367, 0.00014257431030273438, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753042074.1203084, 0, 2025-07-20 16:07:54.120310, 1753042074.1204278, 0.000118255615234375, True 
+bluebell, Default response for bluebell, 1753042183.3790882, 0, 2025-07-20 16:09:43.379093, 1753042183.3792374, 0.00014472007751464844, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753042183.3794143, 0, 2025-07-20 16:09:43.379415, 1753042183.379539, 0.00012373924255371094, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753042253.4592147, 0, 2025-07-20 16:10:53.459219, 1753042253.4593492, 0.00013017654418945312, True 
+bluebell, Default response for bluebell, 1753042253.4595242, 0, 2025-07-20 16:10:53.459525, 1753042253.459644, 0.00011873245239257812, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753042353.6617594, 0, 2025-07-20 16:12:33.661763, 1753042353.6618917, 0.00012874603271484375, True 
+bluebell, Default response for bluebell, 1753042353.6620772, 0, 2025-07-20 16:12:33.662078, 1753042353.6622002, 0.00012183189392089844, True 
+what is happening here,  At the Exquisite Hearing Clinic, we provide hearing healthcare services. We offer hearing tests, hearing aid fittings, and virtual consultations. Our clinic also offers industrial hearing screenings. We prioritize early detection of hearing loss to prevent negative health implications such as social isolation, depression, anxiety, and cognitive decline., 27.501037219, 0, 2025-07-20 16:13:05.177917, 1753042385.178338, 0.00042057037353515625, False 
+bluebell, Default response for bluebell, 1753042879.0218158, 0, 2025-07-20 16:21:19.021820, 1753042879.0219502, 0.00012993812561035156, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753042879.022123, 0, 2025-07-20 16:21:19.022124, 1753042879.022242, 0.00011777877807617188, True 
+1 2 3 4 5,  I'm not sure what numbers 1 through 5 refer to in the context provided. Could you please provide more information or clarify your question?, 26.614235636, 0, 2025-07-20 16:21:58.319430, 1753042918.3198535, 0.000423431396484375, False 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753043083.2739382, 0, 2025-07-20 16:24:43.273942, 1753043083.2740746, 0.0001323223114013672, True 
+bluebell, Default response for bluebell, 1753043083.2742445, 0, 2025-07-20 16:24:43.274246, 1753043083.274365, 0.00011920928955078125, True 
+bluebell, Default response for bluebell, 1753043351.2995992, 0, 2025-07-20 16:29:11.299605, 1753043351.2998717, 0.00026679039001464844, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753043351.300068, 0, 2025-07-20 16:29:11.300069, 1753043351.3001988, 0.00012946128845214844, True 
+one two three four five,  I'm not sure., 27.737341445, 0, 2025-07-20 16:29:47.258877, 1753043387.2592664, 0.00038933753967285156, False 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753043549.4827735, 0, 2025-07-20 16:32:29.482779, 1753043549.4829173, 0.00013875961303710938, True 
+bluebell, Default response for bluebell, 1753043549.4830925, 0, 2025-07-20 16:32:29.483094, 1753043549.4832158, 0.00012230873107910156, True 
+bluebell, Default response for bluebell, 1753045374.4051058, 0, 2025-07-20 17:02:54.405110, 1753045374.4052408, 0.00013065338134765625, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753045374.4054098, 0, 2025-07-20 17:02:54.405411, 1753045374.4055326, 0.00012159347534179688, True 
+bluebell, Default response for bluebell, 1753045723.43886, 0, 2025-07-20 17:08:43.438864, 1753045723.438995, 0.00013113021850585938, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753045723.4391696, 0, 2025-07-20 17:08:43.439170, 1753045723.439292, 0.00012159347534179688, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753045817.5094697, 0, 2025-07-20 17:10:17.509474, 1753045817.5096264, 0.00015234947204589844, True 
+bluebell, Default response for bluebell, 1753045817.5098014, 0, 2025-07-20 17:10:17.509803, 1753045817.5099266, 0.0001239776611328125, True 
