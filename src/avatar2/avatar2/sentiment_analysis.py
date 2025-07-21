@@ -23,19 +23,19 @@ class SentimentAnalysisNode(Node):
 
     def _callback(self, data):
         self.get_logger().info(f"Sentiment analysis for {data.seq}")
-#        score = self._sentimentAnalysis.analyze(data.audio, format=data.format)
+        score = self._sentimentAnalysis.analyze(data.audio, format=data.format)
         # sentiments = ['anger', 'excited', 'neutral', 'sad', 'happy', 'fear', 'surprised']
         # self.get_logger().info(f"Sentiment score type {type(score)}")
-#        max_index = score.argmax()
-#        max_confidence = score[max_index]
-#        max_feeling = self._sentiments[max_index]
+        max_index = score.argmax()
+        max_confidence = score[max_index]
+        max_feeling = self._sentiments[max_index]
 
         sentiment_analysis = SentimentAnalysis()
         sentiment_analysis.header.stamp = self.get_clock().now().to_msg()
         sentiment_analysis.audio_sequence_number = data.seq
-#        sentiment_analysis.result = score.tolist()
-#        sentiment_analysis.confidence = max_confidence.item()
-#        sentiment_analysis.emotion = max_feeling
+        sentiment_analysis.result = score.tolist()
+        sentiment_analysis.confidence = max_confidence.item()
+        sentiment_analysis.emotion = max_feeling
         self._publisher.publish(sentiment_analysis)
 
 def main(args=None):

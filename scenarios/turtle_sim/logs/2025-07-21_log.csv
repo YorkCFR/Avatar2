@@ -1,0 +1,7 @@
+query, response, timestamp (time taken to generate/update the response), count, entry time, current time of logging, time difference
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753120185.6444926, 0, 1753120185.644497, 1753120185.644632, 0.00013518333435058594, True
+bluebell, Default response for bluebell, 1753120185.6448197, 0, 2025-07-21 13:49:45.644821, 1753120185.6449451, 0.00012445449829101562, True 
+bluebell, Default response for bluebell, 1753120375.847302, 0, 2025-07-21 13:52:55.847306, 1753120375.847435, 0.0001289844512939453, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753120375.847614, 0, 2025-07-21 13:52:55.847615, 1753120375.8477387, 0.00012350082397460938, True 
+bluebell, Default response for bluebell, 1753120668.5717163, 0, 2025-07-21 13:57:48.571720, 1753120668.5718474, 0.00012755393981933594, True 
+a hollow voice says plugh, Default response for a hollow voice says plugh, 1753120668.5720286, 0, 2025-07-21 13:57:48.572030, 1753120668.5721502, 0.0001201629638671875, True 

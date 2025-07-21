@@ -39,6 +39,7 @@ setup(
             'text_dump = avatar2.text_dump:main',                       # dump a tagged string to the log (debug)
             'play_text_syncd = avatar2.play_text_syncd:main',           # play text sync'd to an avatar
             'llm_engine = avatar2.llm_engine:main',
+            'llm_engine_robot = avatar2.llm_engine_robot:main',
             'ros_avatar = avatar2.ros_avatar:main',
             'llm_only = avatar2.llm_only:main',
             'sentiment_analysis = avatar2.sentiment_analysis:main',
