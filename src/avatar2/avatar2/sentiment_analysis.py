@@ -13,8 +13,8 @@ class SentimentAnalysisNode(Node):
         sentiment = self.get_parameter('sentiment').get_parameter_value().string_value
         self.declare_parameter('sentiments', ['anger', 'excited', 'neutral', 'sad', 'happy', 'fear', 'surprised'])
         self._sentiments = self.get_parameter('sentiments').get_parameter_value().string_array_value
-        self.declare_parameter('classification_model', 'classification_model')
-        classification_model = self.get_parameter('sentiment').get_parameter_value().string_value
+        self.declare_parameter('classification_model', '/home/walleed/Avatar2/src/avatar2/classification_model/model')
+        classification_model = self.get_parameter('classification_model').get_parameter_value().string_value
 
         self._sentimentAnalysis = Sentiment(model=classification_model)
 

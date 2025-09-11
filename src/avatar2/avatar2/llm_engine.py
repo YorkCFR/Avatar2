@@ -60,7 +60,7 @@ class LLMEngine(Node):
             except:
                 self.get_logger().error(f'{self.get_name()} missing data in config')
                 self.get_logger().error(f'{self.get_name()} root {root}')
-                self.get_logger().error(f'{self.get_name()} vecstore {vecstore}')
+                self.get_logger().error(f'{self.get_name()} vectorstore {vectorstore}')
                 self.get_logger().error(f'{self.get_name()} model {model}')
                 self.get_logger().error(f'{self.get_name()} prompt {prompt}')
                 self.get_logger().error(f'{self.get_name()} cache {cache}')

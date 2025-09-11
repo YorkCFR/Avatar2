@@ -6,7 +6,8 @@ import numpy
 import math
 from scipy.fftpack import fft
 from scipy.fftpack.realtransforms import dct
-from scipy.signal import lfilter, hamming
+from scipy.signal import lfilter
+from scipy.signal.windows import hamming
 
 """
 Code taken from IEMOCAP-Emotion-Detection by Samarth-Tripathi

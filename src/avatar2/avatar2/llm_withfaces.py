@@ -16,7 +16,7 @@ import pickle
 
 class LLMWithFaces(LLM):
     _NO_FACE_RESET = 10.0
-    def __init__(self, model, prompt, format, vectorstore, node, max_vectors=2, n_ctx=2048, temperature=0, verbose=False, n_gpu_layers=26, debug = False):
+    def __init__(self, model, prompt, format, vectorstore, node, max_vectors=2, n_ctx=4096, temperature=0, verbose=False, n_gpu_layers=-1, debug = False):
         node.get_logger().info(f'{node.get_name()} openning face vectorstore {vectorstore}')
         with open(vectorstore, "rb") as f:
             self.vectorstore = pickle.load(f)
@@ -78,6 +78,6 @@ class LLMWithFaces(LLM):
         for doc in docs:
             prompt = prompt + "\n" + doc.page_content
         prompt = prompt + self._format.format(question=text)
-    
-        resp = self._llm(prompt)
+
+        resp = self._llm.invoke(prompt)
         return prompt, resp

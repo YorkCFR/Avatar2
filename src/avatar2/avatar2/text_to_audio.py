@@ -1,15 +1,16 @@
 #
-# Convert text to audio
+# Convert text to audio using LOCAL TTS engines
 #
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 from avatar2_interfaces.msg import Audio, TaggedString
 from rclpy.qos import QoSProfile
-from TTS.utils.manage import ModelManager
-from TTS.utils.synthesizer import Synthesizer
+from pydub import AudioSegment
 import tempfile
 import os
+import io
+import subprocess
 
 
 
@@ -20,47 +21,83 @@ class Text2AudioNode(Node):
         audio = self.get_parameter('audio').get_parameter_value().string_value
         self.declare_parameter('message', '/avatar2/out_message')
         message = self.get_parameter('message').get_parameter_value().string_value
-        self.declare_parameter('device', 'cuda') # or cpu
-        cuda = self.get_parameter('device').get_parameter_value().string_value == 'cuda'
-        self.declare_parameter('site_path', "~/.local/lib/python3.10/site-packages/TTS/.models.json") # where local TTS models live
-        site_path = self.get_parameter('site_path').get_parameter_value().string_value
-        self.declare_parameter('model', "tts_models/en/ljspeech/tacotron2-DDC") # voice model to use
-        model = self.get_parameter('model').get_parameter_value().string_value
         self.declare_parameter('debug', False)
         self._debug = self.get_parameter('debug').get_parameter_value().bool_value
-
-        # do all that is needed to fire up TTS
-        model_manager = ModelManager(site_path)
-        model_path, config_path, model_item = model_manager.download_model(model)
-        voc_path, voc_config_path, _ = model_manager.download_model(model_item["default_vocoder"])
-        self._syn = Synthesizer(tts_checkpoint=model_path, tts_config_path=config_path, 
-                                vocoder_checkpoint=voc_path, vocoder_config=voc_config_path, use_cuda=cuda)
+        self.declare_parameter('voice_model', '/home/walleed/Avatar2/tts_models/en_US-lessac-high.onnx')
+        self._voice_model = self.get_parameter('voice_model').get_parameter_value().string_value
+        self.get_logger().info(f'Voice model: {self._voice_model}')
 
         self.create_subscription(TaggedString, message, self._callback, QoSProfile(depth=1))
         self._publisher = self.create_publisher(Audio, audio, QoSProfile(depth=1))
-        self.get_logger().info(f'Running with debug {self._debug}')
+        self.get_logger().info(f'Running with debug {self._debug}, using Piper TTS')
 
     def _callback(self, data):
         if self._debug:
             self.get_logger().info(f'{self.get_name()} about to say |{data.text.data}|')
-        out = self._syn.tts(data.text.data)
-        fp = tempfile.NamedTemporaryFile(delete=False,suffix=".wav")
-        fp.close()
-        if self._debug:
-            self.get_logger().info(f'{self.get_name()} saving to {fp.name}')
-        self._syn.save_wav(out, fp.name)
-        with open(fp.name, "rb") as f:
-            audio_data = f.read()
+        
+        try:
+            wav_data = self._generate_local_audio(data.text.data)
+                
+            if wav_data:
+                # Publish the WAV audio data
+                msg = Audio()
+                msg.audio = wav_data.hex()
+                msg.format = "WAV_1_22050"  # Match ros_avatar supported format
+                msg.text = String()
+                msg.text.data = data.text.data
+                msg.header.stamp = self.get_clock().now().to_msg()
+                msg.seq = data.audio_sequence_number
+                self._publisher.publish(msg)
+                
+        except Exception as e:
+            self.get_logger().error(f'TTS generation failed: {e}')
 
-            msg = Audio()
-            msg.audio = audio_data.hex()
-            msg.format = "WAV_1_22050"  # known magically
-            msg.text = String()
-            msg.text.data = data.text.data
-            msg.header.stamp = self.get_clock().now().to_msg()
-            msg.seq = data.audio_sequence_number
-            self._publisher.publish(msg)
-        os.remove(fp.name)
+    def _generate_local_audio(self, text):
+        """Generate high-quality audio using Piper TTS"""
+        try:
+            # Create temporary WAV file
+            temp_wav_file = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
+            temp_wav_file.close()
+            
+            # Run Piper TTS command with optimized quality settings
+            cmd = [
+                'piper',
+                '--model', self._voice_model,
+                '--output-file', temp_wav_file.name,
+                '--length-scale', '1.0',
+                '--noise-scale', '0.333',
+                '--noise-w-scale', '0.333',
+                '--sentence-silence', '0.2'
+            ]
+            
+            # Execute Piper with text input
+            process = subprocess.run(
+                cmd,
+                input=text,
+                text=True,
+                capture_output=True,
+                check=True
+            )
+            
+            # Load and convert audio to target format (mono, 22050Hz, 16-bit)
+            audio = AudioSegment.from_wav(temp_wav_file.name)
+            audio = audio.set_channels(1).set_frame_rate(22050).set_sample_width(2)
+            
+            # Export to WAV format in memory
+            wav_buffer = io.BytesIO()
+            audio.export(wav_buffer, format="wav")
+            wav_data = wav_buffer.getvalue()
+            
+            # Clean up
+            os.remove(temp_wav_file.name)
+            return wav_data
+            
+        except subprocess.CalledProcessError as e:
+            self.get_logger().error(f'Piper TTS command failed: {e}')
+            return None
+        except Exception as e:
+            self.get_logger().error(f'Piper TTS error: {e}')
+            return None
 
 def main(args=None):
     rclpy.init(args=args)

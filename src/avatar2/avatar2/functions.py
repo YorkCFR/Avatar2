@@ -1,6 +1,8 @@
 import wave
-#from keras.models import load_model
-from tf.keras.models import load_model
+from keras.models import load_model
+import tensorflow as tf
+from keras.layers import TFSMLayer
+# from tf.keras.models import load_model
 from .helper import pad_sequence_into_array
 from .features import *
 # from graph_formating import *
@@ -64,7 +66,11 @@ def predict_on_model(file_name, model_path):
     CHUNK = int(RATE / 2)
 
     # set up model
-    model = load_model(model_path)
+    # model = load_model(model_path)
+    # model = load_model(model_path, custom_objects={'TFSMLayer': TFSMLayer})
+    model = tf.keras.models.Sequential([
+                TFSMLayer(model_path, call_endpoint='serving_default')
+            ])
 
     process_buffer = deque(maxlen=WINDOW_N)
     # create empty buffer for holding in file data

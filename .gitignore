@@ -6,6 +6,8 @@ __pycache__/
 *.gguf
 *.bin
 *.pkl
+# TTS model files (too large for GitHub)
+tts_models/*.onnx
 # This .gitignore file should be placed at the root of your Unity project directory
 #
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
