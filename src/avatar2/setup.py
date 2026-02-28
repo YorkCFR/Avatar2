@@ -6,7 +6,7 @@ package_name = 'avatar2'
 
 setup(
     name=package_name,
-    version='0.0.3',
+    version='0.1.0',
     packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
@@ -14,6 +14,7 @@ setup(
         (os.path.join('share', package_name), glob('/classification_model/*')),
         (os.path.join('share', package_name), glob('/classifications/models/*')),
         (os.path.join('share', package_name), glob('launch/*.launch.py')),
+        (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,

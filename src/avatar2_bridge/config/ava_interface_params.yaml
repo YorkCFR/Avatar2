@@ -1,0 +1,6 @@
+welcomeAvatar/avatar/ava_bridge:
+  ros__parameters:
+    port: 5678
+    ipaddr: "127.0.0.1"
+    debug: True
+    out_message: /welcomeAvatar/avatar/out_message

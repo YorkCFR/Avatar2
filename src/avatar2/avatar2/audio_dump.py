@@ -1,3 +1,7 @@
+#
+# Dump an Audio message stream as a collection of wav files.
+# Possibly useful for debugging
+#
 import rclpy
 from rclpy.node import Node
 from avatar2_interfaces.msg import Audio

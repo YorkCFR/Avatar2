@@ -1,7 +1,5 @@
 #
-# Convert text to audio using LOCAL TTS piper engine.
-#
-# piper is installed through pip as pip3 install piper-tts
+# Convert text to audio using LOCAL TTS engines
 #
 import rclpy
 from rclpy.node import Node

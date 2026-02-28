@@ -61,8 +61,8 @@ class ProcessAudioNode(Node):
                 if self.msg_id == 0:
                     if self._threshold > 0:
                         self.recognizer.energy_threshold = self._threshold
-                    else:
-                        self.recognizer.adjust_for_ambient_noise(source)
+#                    else:
+#                        self.recognizer.adjust_for_ambient_noise(source)
                 if self._debug:
                     self.get_logger().info(f"Audio source waiting for input {self._phrase_time_limit}")
                 if self._phrase_time_limit > 0:

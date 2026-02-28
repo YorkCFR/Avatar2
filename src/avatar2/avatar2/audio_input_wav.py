@@ -1,3 +1,9 @@
+#
+# Simulate audio input into the system by playing all the wav files in a directory
+# into the system
+# 
+# Possibly useful for debugging
+#
 import rclpy
 from rclpy.node import Node
 from avatar2_interfaces.msg import Audio

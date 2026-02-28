@@ -1,3 +1,15 @@
+#
+# Convert audio input (wav) into text. This uses whisper to do the actual tts work.
+# Beyond this, the only thing that this node # does that is marginally interesting 
+# beyond that is that it can be told to # listen or to not listen. 
+#
+# This is critical so that that system does not listen
+# to itself 
+#
+# Note that there should only be one service provider running in the entire system at 
+# any one time. 
+#
+
 import rclpy
 from rclpy.node import Node
 from avatar2_interfaces.msg import Audio, TaggedString
@@ -26,34 +38,49 @@ class Audio2TextNode(Node):
         model = self.get_parameter('model').get_parameter_value().string_value
         self.declare_parameter('listen', '/avatar2/listen')
         self._listen = self.get_parameter('listen').get_parameter_value().string_value
+        self.declare_parameter('not_listen_timeout', 2.0) # in seconds
+        self._not_listen_timeout = self.get_parameter('listen').get_parameter_value().double_value * 1e9 # convert to mano seconds
 
         self._model = whisper.load_model(model, device=cuda)
 
-        self.create_subscription(Audio, topic, self._callback, QoSProfile(depth=1))
+        self.create_subscription(Audio, topic, self._audio_callback, QoSProfile(depth=1))
         self._publisher = self.create_publisher(TaggedString, message, QoSProfile(depth=1))
 
         self.create_service(Listen, self._listen, self._listener_callback)
         self._listening = True
-        self._listening_time = self.get_clock().now().nanoseconds
+        self._not_listening_time = 0
 
         if self._debug:
-            self.get_logger().info(f"{self.get_name()} Time {self._listening_time}")
-            self.get_logger().info(f"{self.get_name()} publishing to {message}")
+            self.get_logger().info(f"{self.get_name()} Time {self._not_listening_time} publishing to {message}")
 
     def _listener_callback(self, msg, resp):
-        """Deal with service call to set listening status"""
+        """Deal with service call to set listening status. If listening, we listen. Otherwise ignore messages"""
         if self._debug:
-            if self._listening != msg.listen:
-                if self._debug:
-                    self.get_logger().info(f"{self.get_name()} Changing listening status from {self._listening} to {msg.listen}")
-                if msg.listen:
-                    self._listening_time = self.get_clock().now().nanoseconds
+            self.get_logger().info(f"{self.get_name()} Changing listening status from {self._listening} to {msg.listen}")
         self._listening = msg.listen
         resp.status = self._listening
+        if not self._listening:
+            self._not_listening_time = self.get_clock().now().nanoseconds 
         return resp
 
-    def _callback(self, data):
+    def _audio_callback(self, data):
+        """Deal with an audio message"""
+        if self._debug:
+            self.get_logger().info(f"Listening to message sequence number {data.seq} |{result['text']}|")
 
+	# timeout if _not_listening
+        if (not self._listening) and (self.get_clock().now().nanoseconds > (self._not_listening_time + self._not_listening_timeout)):
+            if self._debug:
+                self.get_logger().info(f"Not listening timeout. Going to start listening again (starting now)")
+            self._listening = True
+
+        # if not listening, ignore the packet
+        if not self._listening:
+            if self._debug:
+                self.get_logger().info(f"We are not listening, so ignore the packet")
+            return
+
+        # process the packet
         fd, path = tempfile.mkstemp(suffix=".wav")
         with os.fdopen(fd, 'wb') as f:
             f.write(bytes.fromhex(data.audio))
@@ -63,14 +90,7 @@ class Audio2TextNode(Node):
             self.get_logger().info(f"{self.get_name()} Non-ascii characters detected in the result")
         # Replace the non-ascii characters with spaces
         result['text'] = ''.join([char if char.isascii() else ' ' for char in result['text']])
-        
-        if (not self._listening) or (self.get_clock().now().nanoseconds < self._listening_time + 2 * 1e9):
-            if self._debug:
-                self.get_logger().info(f"{self.get_name()} Not listening (listening is {self._listening}) to message sequence number {data.seq} |{result['text']}|")
-                self.get_logger().info(f"{self.get_name()} Not listening (listening is {self._listening}) Time diff is {(self.get_clock().now().nanoseconds - self._listening_time) /1e9}")
-            return
-        if self._debug:
-            self.get_logger().info(f"{self.get_name()} Listening to message sequence number {data.seq} |{result['text']}|")
+
         tagged_string = TaggedString()
         tagged_string.header.stamp = self.get_clock().now().to_msg()
         tagged_string.audio_sequence_number = data.seq

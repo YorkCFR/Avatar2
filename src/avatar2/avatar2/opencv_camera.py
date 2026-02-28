@@ -10,13 +10,19 @@ class OpenCVCamera(Node):
     def __init__(self, rostopic='/avatar2/avatar_camera/image_raw', port=2):
         super().__init__('avatar_camera')
 
+        # debug param
+        self.declare_parameter('debug', False)
+        self._debug = self.get_parameter('debug').get_parameter_value().bool_value
+        self.get_logger().info(f'{self.get_name()} node created, debug is {self._debug}')
+
         self.declare_parameter('topic', rostopic)
         rostopic = self.get_parameter('topic').get_parameter_value().string_value
 
         self.declare_parameter('port', port)
         port = self.get_parameter('port').get_parameter_value().integer_value
 
-        self.get_logger().info(f'{self.get_name()} publishing from camera {port} on {rostopic}')
+        if(self._debug):
+            self.get_logger().info(f'{self.get_name()} publishing from camera {port} on {rostopic}')
 
         try:
             self._camera =  cv2.VideoCapture(port, cv2.CAP_V4L2)

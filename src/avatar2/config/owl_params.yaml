@@ -1,0 +1,41 @@
+welcomeAvatar/avatar/sound_capture:
+  ros__parameters:
+    audio_port: 3
+    topic: /welcomeAvatar/avatar/in_raw_audio
+    non_speaking_duration: 1.0
+    pause_threshold: 1.0
+    debug: False
+welcomeAvatar/avatar/sound_to_text:
+  ros__parameters:
+    topic: /welcomeAvatar/avatar/in_raw_audio
+    device: cuda
+    message: /welcomeAvatar/avatar/in_message
+    model: base
+    listen: /WelcomeAvatar/avatar/listen
+    not_listen_timeout: 2.0
+    debug: False
+welcomeAvatar/avatar/text_to_sound:
+  ros__parameters:
+    debug: True
+    audio: /welcomeAvatar/avatar/out_raw_audio
+    message: /welcomeAvatar/avatar/out_message
+    voice_model: /home/jenkin/Documents/avatar/Avatar2/tts_models/en_US-lessac-high.onnx
+welcomeAvatar/avatar/sentiment_analysis:
+  ros__parameters:
+    debug: True
+    topic: /welcomeAvatar/avatar/in_raw_audio
+    sentiment: /welcomeAvatar/avatar/sentiment_analysis
+    sentiments: ["anger", "excited", "neutral", "sad", "happy", "fear", "surprised"]
+    classification_model: /home/jenkin/Documents/avatar/Avatar2/src/avatar2/classification_model/model
+welcomeAvatar/avatar/avatar_camera:
+  ros__parameters:
+    debug: True
+    port: 0
+    topic: /welcome/avatar_camera/image_raw
+welcomeAvatar/avatar/head_detect:
+  ros__parameters:
+    debug: True
+welcomeAvatar/avatar/user_tracker:
+  ros__parameters:
+    debug: True
+    
