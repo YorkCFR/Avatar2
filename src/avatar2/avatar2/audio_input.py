@@ -29,6 +29,9 @@ class ProcessAudioNode(Node):
         self._debug = self.get_parameter('debug').get_parameter_value().bool_value
         self.get_logger().info(f'{self.get_name()} node created, debug is {self._debug}')
 
+        self.declare_parameter('audio_port', 0)
+        self._audio_port = self.get_parameter('audio_port').get_parameter_value().integer_value
+        self.get_logger().info(f'{self.get_name()} node created, using audio port {self._audio_port}')
         self.declare_parameter('topic', '/avatar2/in_raw_audio')
         self._topic = self.get_parameter('topic').get_parameter_value().string_value
         self.declare_parameter('threshold', "0")
@@ -50,16 +53,16 @@ class ProcessAudioNode(Node):
         self.recognizer.non_speaking_duration = self._non_speaking_duration
         self.recognizer.dynamic_energy_threshold = self._dynamic
 
-        if self._threshold > 0:
-            self.recognizer.energy_threshold = self._threshold
-        else:
-            with sr.Microphone(sample_rate=self._sample_rate) as source:
-                self.recognizer.adjust_for_ambient_noise(source)
-
+        self.get_logger().info(f'{self.get_name()} using input {sr.Microphone.list_microphone_names()[self._audio_port]}')
         self.msg_id = 0
 
         while rclpy.ok():
-            with sr.Microphone(sample_rate=self._sample_rate) as source:
+            with sr.Microphone(sample_rate=self._sample_rate, device_index=self._audio_port) as source:
+                if self.msg_id == 0:
+                    if self._threshold > 0:
+                        self.recognizer.energy_threshold = self._threshold
+                    else:
+                        self.recognizer.adjust_for_ambient_noise(source)
                 if self._debug:
                     self.get_logger().info(f"Audio source waiting for input {self._phrase_time_limit}")
                 if self._phrase_time_limit > 0:
