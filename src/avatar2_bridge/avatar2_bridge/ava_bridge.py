@@ -25,25 +25,49 @@ class AvaBridgeNode(Node):
         self._ipaddr = self.get_parameter('ipaddr').get_parameter_value().string_value
         self.declare_parameter('port', 8765)
         self._port = self.get_parameter('port').get_parameter_value().integer_value
-        self.declare_parameter('out_message', '/avatar2/out_message')
-        self._out_message = self.get_parameter('out_message').get_parameter_value().string_value
-        self.declare_parameter('out_command', '/avatar2/out_command')
-        self._out_command = self.get_parameter('out_command').get_parameter_value().string_value
+        self.declare_parameter('welcomeAvatar_out_message', '/welcomeAvatar/avatar/out_message')
+        topic = self.get_parameter('welcomeAvatar_out_message').get_parameter_value().string_value
+        self._welcomeAvatar_out_message_publisher = self.create_publisher(TaggedString, topic, QoSProfile(depth=1))
+
+#        self.declare_parameter('out_command', '/avatar2/out_command')
+#        self._out_command = self.get_parameter('out_command').get_parameter_value().string_value
 
 #        self.create_subscription(TaggedString, self._out_topic, self._stt_callback, QoSProfile(depth=1))
 
         # Poll for WebSocket messages every 100ms
         # self.create_timer(0.1, self._process_ws_messages)
 
-        if self._debug:
-            self.get_logger().info(f'AvaBridge started, publish to {self._out_message} and {self._out_command}, WebSocket {self._ipaddr} port {self._port}')
+#        if self._debug:
+#            self.get_logger().info(f'AvaBridge started, publish to {self._out_message} and {self._out_command}, WebSocket {self._ipaddr} port {self._port}')
         
     def ProcessMessage(self, msg, websocket):
         """ Process a message from the outsde world """
         package = json.loads(msg)
-        self.get_logger().info(f"Received message: {msg} command {package['command']} argument {package['argument']}")
-        websocket.send("got it")
+#        self.get_logger().info(f"Received message: {msg} command {package['command']} argument {package['argument']}")
 
+#
+#       All messages have a cmd (command) - string
+#       All messages have a dest (destination) one of the avatars - string
+#       All messages have an arg (argument) - a string that parses as a valid json structure
+
+        cmd = package['cmd']
+        dest = package['dest']
+        arg = package['args']
+
+        if cmd == 'say':
+            self.get_logger().info(f"shoud emit a string message to {dest} with argument {arg}")
+#            self._welcomeAvatar_out_message_publisher.publish(arg['text']) # tagged string
+        elif cmd == 'action':
+            self.get_logger().info(f"shoud tell avatar at {dest} to conduct {arg}")
+        else:
+            self.get_logger().info(f"no idea what {cmd} is")
+
+        # and for fun, send out something
+        if self._loop:
+            asyncio.run_coroutine_threadsafe(
+                self._broadcast("hello nurse"),
+                self._loop
+            )
         
 
     def _stt_callback(self, msg):
