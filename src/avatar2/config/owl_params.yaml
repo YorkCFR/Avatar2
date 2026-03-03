@@ -29,12 +29,15 @@ welcomeAvatar/avatar/sentiment_analysis:
     classification_model: /home/jenkin/Documents/avatar/Avatar2/src/avatar2/classification_model/model
 welcomeAvatar/avatar/avatar_camera:
   ros__parameters:
-    debug: True
+    debug: False
     port: 0
-    topic: /welcome/avatar_camera/image_raw
+    topic: /welcomeAvatar/avatar_camera/image_raw
 welcomeAvatar/avatar/head_detect:
   ros__parameters:
-    debug: True
+    camera_topic: /welcomeAvatar/avatar_camera/image_raw
+    face_topic: /welcomeAvatar/avatar_camera/faces
+    known_faces: /home/jenkin/Documents/avatar/Avatar2/scenarios/owl/faces
+    debug: False
 welcomeAvatar/avatar/user_tracker:
   ros__parameters:
     debug: True

@@ -75,9 +75,8 @@ def generate_launch_description():
             name='head_detect',
             output='screen',
             namespace = '/welcomeAvatar/avatar',
-#            parameters=[{'root' : root, 'scenario': scenario, 'debug' : False}])
             parameters=[config])
-#    nodes.append(face_recognizer_node)
+    nodes.append(face_recognizer_node)
     
     user_tracker_node = Node(
             package='avatar2',

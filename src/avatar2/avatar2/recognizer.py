@@ -1,6 +1,9 @@
 #
 # Do face recognition, and publish face information as detected
 #
+# This now ignores the scenario file information, and evertything comes
+# from the config file structure
+#
 import os
 import sys
 import rclpy
@@ -25,40 +28,28 @@ from .FaceRecognizer import FaceRecognizer
 
 
 class Recognizer(Node):
-    def __init__(self, root = 'scenario', scenario = 'hearing_clinic', config_file = 'config.json'):
+    def __init__(self):
         super().__init__('recognizer_node')
         self.get_logger().info(f'{self.get_name()} node created')
-        self.declare_parameter('root', config_file)
-        root = self.get_parameter('root').get_parameter_value().string_value
-        self.declare_parameter('scenario', scenario)
-        scenario = self.get_parameter('scenario').get_parameter_value().string_value
-        self.declare_parameter('config_file', config_file)
-        config_file = self.get_parameter('config_file').get_parameter_value().string_value
-        config_file = os.path.join(root, scenario, config_file)
-        try:
-            with open(config_file, 'r') as f:
-                config = json.load(f)
-        except Exception as e:
-            self.get_logger().error(f'{self.get_name()} unable to parse config_file {config_file} error {e}')
-            sys.exit(1)
-            
-        try:
-            self._debug = config.get('debug', False)
-            self._face_topic = config['face_topic']   
-            self._camera_topic = config['camera_topic']
-            person_classes = config['person_classes']
-        
-        except Exception as e:
-            self.get_logger().error(f'{self.get_name()} unable to get all params from {config_file} {e}')
-            sys.exit(1)
+        self.declare_parameter('debug', False)
+        self._debug = self.get_parameter('debug').get_parameter_value().bool_value
+        self.declare_parameter('camera_topic', '/avatar2/image_raw')
+        self._camera_topic = self.get_parameter('camera_topic').get_parameter_value().string_value
+        self.declare_parameter('face_topic', '/avatar2/speaker_info')
+        self._face_topic = self.get_parameter('face_topic').get_parameter_value().string_value
+        self.declare_parameter('known_faces', 'faces_path')
+        self._known_faces = self.get_parameter('known_faces').get_parameter_value().string_value
+
+        encodings = Path(os.path.join(self._known_faces, "faces.pkl"))
+        database = Path(os.path.join(self._known_faces, "faces.json"))
 
         self._msg_id = 0
         if self._debug:
-            self.get_logger().info(f'{self.get_name()} root is {root}')
-            self.get_logger().info(f'{self.get_name()} person classes is {person_classes}')
+            self.get_logger().info(f'debug is {self._debug}')
+            self.get_logger().info(f'camera_topic is {self._camera_topic}')
+            self.get_logger().info(f'face_topic is {self._face_topic}')
+            self.get_logger().info(f'known_faces is {self._known_faces}')
 
-        encodings = Path(os.path.join(root, scenario, 'faces', "faces.pkl"))
-        database = Path(os.path.join(root, scenario, 'faces', "faces.json"))
     
         self._bridge = CvBridge()
 
