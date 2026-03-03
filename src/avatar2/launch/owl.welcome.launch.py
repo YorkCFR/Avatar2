@@ -84,9 +84,8 @@ def generate_launch_description():
             name='user_tracker',
             output='screen',
             namespace = '/welcomeAvatar/avatar',
-#            parameters=[{'config_file': config_file, 'debug' : False}])
             parameters=[config])
-#    nodes.append(user_tracker_node)
+    nodes.append(user_tracker_node)
 
 #    if ros_ui:
 #        ros_node = Node(

@@ -11,6 +11,8 @@
 # last_name ::= last name as a string (only valid for Starting)
 # role ::= role of the person (only valid for starting)
 # proxemics ::= "intimate" | "personal" | "social" |  "public" 
+#
+# This now uses the more standard configuration structure
 # 
 #
 import os
@@ -23,36 +25,26 @@ from rclpy.qos import QoSProfile
 from avatar2_interfaces.msg import SpeakerInfo, TaggedString
 
 class ConversationTrackerNode(Node):
-    def __init__(self, root = 'scenario', scenario = 'hearing_clinic', config_file = 'config.json'):
+    def __init__(self):
         super().__init__('conversation_tracker_node')
-        self.get_logger().info(f'{self.get_name()} node created')
-        self.declare_parameter('root', config_file)
-        root = self.get_parameter('root').get_parameter_value().string_value
-        self.declare_parameter('scenario', scenario)
-        scenario = self.get_parameter('scenario').get_parameter_value().string_value
-        self.declare_parameter('config_file', config_file)
-        config_file = self.get_parameter('config_file').get_parameter_value().string_value
-        config_file = os.path.join(root, scenario, config_file)
-        self.get_logger().error(f'{self.get_name()} loading from config_file {config_file}')
-        try:
-            with open(config_file, 'r') as f:
-                config = json.load(f)
-        except Exception as e:
-            self.get_logger().error(f'{self.get_name()} unable to parse config_file {config_file} error {e}')
-            sys.exit(1)
+        self.get_logger().info(f'node created')
 
-        try:
-            self._debug = config.get('debug', False)
-            self._face_topic = config['face_topic']
-            self._tracker_topic = config['tracker_topic']
-            self._conversation_timeout = config['conversation_timeout']   # if the tracked face does not appear for this long, end this conversation
-            self._new_person_threshold = config['new_person_threshold']   # how long to continue the conversation if a new person is seen
-            self._intimate = config['intimate']
-            self._personal = config['personal']
-            self._social = config['social']
-        except Exception as e:
-            self.get_logger().error(f'{self.get_name()} unable to get params from {config_file} error {e}')
-            sys.exit(1)
+        self.declare_parameter('debug', False)
+        self._debug = self.get_parameter('debug').get_parameter_value().bool_value
+        self.declare_parameter('face_topic', '/avatar2/face_topic')
+        self._face_topic = self.get_parameter('face_topic').get_parameter_value().string_value
+        self.declare_parameter('tracker_topic', '/avatar2/tracker_topic')
+        self._tracker_topic = self.get_parameter('tracker_topic').get_parameter_value().string_value
+        self.declare_parameter('conversation_timeout', 1.0)
+        self._conversation_timeout = self.get_parameter('conversation_timeout').get_parameter_value().double_value
+        self.declare_parameter('new_person_threshold', 1.0)
+        self._new_person_threshold = self.get_parameter('new_person_threshold').get_parameter_value().double_value
+        self.declare_parameter('intimate', 200.0)
+        self._intimate = self.get_parameter('intimate').get_parameter_value().double_value
+        self.declare_parameter('personal', 100.0)
+        self._personal = self.get_parameter('personal').get_parameter_value().double_value
+        self.declare_parameter('social', 50.0)
+        self._social = self.get_parameter('social').get_parameter_value().double_value
             
         self._current_speaker = None
         self._detection_start_time = 0
@@ -60,7 +52,7 @@ class ConversationTrackerNode(Node):
         self._detection_duration = None
 
         self._msg_id = 0
-        self.get_logger().info(f'{self.get_name()} initialized with conversation timeout: {self._conversation_timeout} seconds')
+        self.get_logger().info(f'initialized with conversation timeout: {self._conversation_timeout} seconds')
 
         self._no_face_timer = self.create_timer(1.0, self._no_face_callback)  # Check every second            
         self._subscriber = self.create_subscription(SpeakerInfo, self._face_topic, self._callback, QoSProfile(depth=1))

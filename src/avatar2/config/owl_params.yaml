@@ -31,14 +31,21 @@ welcomeAvatar/avatar/avatar_camera:
   ros__parameters:
     debug: False
     port: 0
-    topic: /welcomeAvatar/avatar_camera/image_raw
+    topic: /welcomeAvatar/avatar/avatar_camera/image_raw
 welcomeAvatar/avatar/head_detect:
   ros__parameters:
-    camera_topic: /welcomeAvatar/avatar_camera/image_raw
-    face_topic: /welcomeAvatar/avatar_camera/faces
+    camera_topic: /welcomeAvatar/avatar/avatar_camera/image_raw
+    face_topic: /welcomeAvatar/avatar/faces
     known_faces: /home/jenkin/Documents/avatar/Avatar2/scenarios/owl/faces
     debug: False
 welcomeAvatar/avatar/user_tracker:
   ros__parameters:
-    debug: True
+    face_topic: /welcomeAvatar/avatar/faces
+    tracker_topic: /welcomeAvatar/avatar/users
+    conversation_timeout: 5.0
+    new_person_threshold: 1.0
+    intimate: 0.11
+    personal: 0.05
+    social: 0.02
+    debug: False
     
