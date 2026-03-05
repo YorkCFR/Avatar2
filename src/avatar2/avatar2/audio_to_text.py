@@ -66,9 +66,10 @@ class Audio2TextNode(Node):
     def _audio_callback(self, data):
         """Deal with an audio message"""
         if self._debug:
-            self.get_logger().info(f"Listening to message sequence number {data.seq} |{result['text']}|")
+            # Confirm that we are receiving the message and print the sequence number
+            self.get_logger().info(f"Listening to message sequence number {data.seq}")
 
-	# timeout if _not_listening
+	    # timeout if _not_listening
         if (not self._listening) and (self.get_clock().now().nanoseconds > (self._not_listening_time + self._not_listening_timeout)):
             if self._debug:
                 self.get_logger().info(f"Not listening timeout. Going to start listening again (starting now)")
@@ -85,6 +86,8 @@ class Audio2TextNode(Node):
         with os.fdopen(fd, 'wb') as f:
             f.write(bytes.fromhex(data.audio))
         result = self._model.transcribe(path, fp16=False)
+        if self._debug:
+            self.get_logger().info(f"Transcribed result |{result['text']} |")
         os.remove(path)
         if not result['text'].isascii():
             self.get_logger().info(f"{self.get_name()} Non-ascii characters detected in the result")

@@ -8,6 +8,13 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from avatar2_interfaces.msg import TaggedString
 
+try:
+    import websockets
+    HAS_WEBSOCKETS = True
+except ImportError:
+    HAS_WEBSOCKETS = False
+    print("websockets library not found. Please install it with 'pip install websockets' to use the AvaBridgeNode.")
+
 class AvaBridgeNode(Node):
 
     def __init__(self, ws_queue):
@@ -25,20 +32,31 @@ class AvaBridgeNode(Node):
         self._ipaddr = self.get_parameter('ipaddr').get_parameter_value().string_value
         self.declare_parameter('port', 8765)
         self._port = self.get_parameter('port').get_parameter_value().integer_value
-        self.declare_parameter('welcomeAvatar_out_message', '/welcomeAvatar/avatar/out_message')
-        topic = self.get_parameter('welcomeAvatar_out_message').get_parameter_value().string_value
-        self._welcomeAvatar_out_message_publisher = self.create_publisher(TaggedString, topic, QoSProfile(depth=1))
 
-#        self.declare_parameter('out_command', '/avatar2/out_command')
-#        self._out_command = self.get_parameter('out_command').get_parameter_value().string_value
+        self.declare_parameter('avatar_name', '/welcomeAvatar')
+        self._avatar_name = self.get_parameter('avatar_name').get_parameter_value().string_value
+
+        self.declare_parameter('in_message', '/welcomeAvatar/avatar/in_message')
+        self._in_topic = self.get_parameter('in_message').get_parameter_value().string_value
+        self._welcomeAvatar_in_message_publisher = self.create_publisher(TaggedString, self._in_topic, QoSProfile(depth=1))
+        
+        self.declare_parameter('out_message', '/welcomeAvatar/avatar/out_message')
+        self._out_topic = self.get_parameter('out_message').get_parameter_value().string_value
+        self._welcomeAvatar_out_message_publisher = self.create_publisher(TaggedString, self._out_topic, QoSProfile(depth=1))
+
+
+        self.declare_parameter('out_command', '/welcomeAvatar/avatar/out_command')
+        self._out_command = self.get_parameter('out_command').get_parameter_value().string_value
 
 #        self.create_subscription(TaggedString, self._out_topic, self._stt_callback, QoSProfile(depth=1))
 
         # Poll for WebSocket messages every 100ms
         # self.create_timer(0.1, self._process_ws_messages)
 
-#        if self._debug:
-#            self.get_logger().info(f'AvaBridge started, publish to {self._out_message} and {self._out_command}, WebSocket {self._ipaddr} port {self._port}')
+        if self._debug:
+            self.get_logger().info(f'AvaBridge with name {self._avatar_name} started, subscribing to {self._in_topic}, publish to {self._out_topic} and {self._out_command}, WebSocket {self._ipaddr} port {self._port}')
+
+        self.create_subscription(TaggedString, self._in_topic, self._stt_callback, QoSProfile(depth=1))
         
     def ProcessMessage(self, msg, websocket):
         """ Process a message from the outsde world """
@@ -76,7 +94,7 @@ class AvaBridgeNode(Node):
         Packages it as JSON and forwards it to Unity Owl via via WebSocket
         """
         text = msg.text.data
-        self.get_logger().info(f"Received message: {msg.text.data}")
+        self.get_logger().info(f"[HEARD]: {msg.text.data}")
 
         payload = json.dumps({
             "command": "say",
