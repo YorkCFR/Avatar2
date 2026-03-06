@@ -8,12 +8,20 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from avatar2_interfaces.msg import TaggedString
 
-try:
-    import websockets
-    HAS_WEBSOCKETS = True
-except ImportError:
-    HAS_WEBSOCKETS = False
-    print("websockets library not found. Please install it with 'pip install websockets' to use the AvaBridgeNode.")
+#	ws<->ros command 
+#
+#       All messages have a cmd (command) - string
+#       All messages have a dest (destination) one of the avatars - string
+#       All messages have an arg (argument) - a string that parses as a valid json structure
+#
+#	Supported to ros messages (cmd)
+#	    say - arg has at least the entry text whose value is what to utter
+#           action - arg has at least the the entry act whose value is a string 
+#          
+#       Suppored from ros message (cmd)
+#           heard - arg has at least the entry text whose value is what the llm heard
+#
+
 
 class AvaBridgeNode(Node):
 
@@ -23,8 +31,9 @@ class AvaBridgeNode(Node):
         self._ws_queue = ws_queue
         self._connected_clients = set()
         self._loop = None
+        self._seq_number = 0
         
-        self.declare_parameter('debug', False)
+        self.declare_parameter('debug', True)
         self._debug = self.get_parameter('debug').get_parameter_value().bool_value
         self.get_logger().info(f'Node created, debug is {self._debug}')
 
@@ -33,59 +42,87 @@ class AvaBridgeNode(Node):
         self.declare_parameter('port', 8765)
         self._port = self.get_parameter('port').get_parameter_value().integer_value
 
-        self.declare_parameter('avatar_name', '/welcomeAvatar')
-        self._avatar_name = self.get_parameter('avatar_name').get_parameter_value().string_value
+        self.declare_parameter('avatar_names', ['dummy'])
+        self._avatar_names = self.get_parameter('avatar_names').get_parameter_value().string_array_value
 
-        self.declare_parameter('in_message', '/welcomeAvatar/avatar/in_message')
+        self.declare_parameter('in_message', '/avatar/in_message')
         self._in_topic = self.get_parameter('in_message').get_parameter_value().string_value
-        self._welcomeAvatar_in_message_publisher = self.create_publisher(TaggedString, self._in_topic, QoSProfile(depth=1))
         
-        self.declare_parameter('out_message', '/welcomeAvatar/avatar/out_message')
+        self.declare_parameter('out_message', '/avatar/out_message')
         self._out_topic = self.get_parameter('out_message').get_parameter_value().string_value
-        self._welcomeAvatar_out_message_publisher = self.create_publisher(TaggedString, self._out_topic, QoSProfile(depth=1))
 
-
-        self.declare_parameter('out_command', '/welcomeAvatar/avatar/out_command')
+        self.declare_parameter('out_command', '/avatar/out_command')
         self._out_command = self.get_parameter('out_command').get_parameter_value().string_value
 
-#        self.create_subscription(TaggedString, self._out_topic, self._stt_callback, QoSProfile(depth=1))
-
-        # Poll for WebSocket messages every 100ms
-        # self.create_timer(0.1, self._process_ws_messages)
-
         if self._debug:
-            self.get_logger().info(f'AvaBridge with name {self._avatar_name} started, subscribing to {self._in_topic}, publish to {self._out_topic} and {self._out_command}, WebSocket {self._ipaddr} port {self._port}')
+            self.get_logger().info(f"ipaddr {self._ipaddr} port {self._port}")
+            self.get_logger().info(f"avatar_names {self._avatar_names} in_topic {self._in_topic} out_topic {self._out_topic} out_command {self._out_command}")
 
-        self.create_subscription(TaggedString, self._in_topic, self._stt_callback, QoSProfile(depth=1))
+        for name in self._avatar_names:
+            topic = "/" + name + self._in_topic
+            if self._debug:
+                self.get_logger().info(f"creating callback for {topic}")
+            self.create_subscription(TaggedString, topic, lambda msg: self._in_message_callback(msg, name), QoSProfile(depth=1))
+
+        self._out_command_publisher = [None] * len(self._avatar_names)
+        self._out_message_publisher = [None] * len(self._avatar_names)
+        for idx, name in enumerate(self._avatar_names):
+            topic = "/" + name + self._out_topic
+            if self._debug:
+                self.get_logger().info(f"creating publisher for {topic}")
+            self._out_message_publisher[idx]  = self.create_publisher(TaggedString, topic, QoSProfile(depth=1))
+            topic = "/" + name + self._out_command
+            if self._debug:
+                self.get_logger().info(f"creating publisher for {topic}")
+            self._out_command_publisher[idx]  = self.create_publisher(TaggedString, topic, QoSProfile(depth=1))
+            topic = name + self._out_command
+
+    def _in_message_callback(self, msg, source):
+        """ Process any of the text inputs"""
+        if self._debug:
+            self.get_logger().info(f"got input text {msg} from {source}")
+        
+        package = '{"cmd" : "heard", "dest" : "' 
+        package = package + source + '", "arg :" '
+        package = package + '{"text" : "' + str(msg.text.data) + '"}}'
+        if self._loop:
+            asyncio.run_coroutine_threadsafe(
+                self._broadcast(package),
+                self._loop
+            )
+            
         
     def ProcessMessage(self, msg, websocket):
         """ Process a message from the outsde world """
-        package = json.loads(msg)
-#        self.get_logger().info(f"Received message: {msg} command {package['command']} argument {package['argument']}")
-
-#
-#       All messages have a cmd (command) - string
-#       All messages have a dest (destination) one of the avatars - string
-#       All messages have an arg (argument) - a string that parses as a valid json structure
-
-        cmd = package['cmd']
-        dest = package['dest']
-        arg = package['args']
+        try:
+            package = json.loads(msg)
+            cmd = package['cmd']
+            dest = package['dest']
+            arg = package['args']
+        except Exception as e:
+            self.get_logger().info(f"unable to parse message from remote llm {msg}")
+            return
+        who = self._avatar_names.index(dest)
+        full_name = '/'  + dest + self._out_topic
+            
+        if self._debug:
+            self.get_logger().info(f"Received message: command {cmd} dest {dest} index {who} argument {arg}")
+            full_name = '/'  + dest + self._out_topic
+            self.get_logger().info(f"going to publish to {full_name}")
 
         if cmd == 'say':
-            self.get_logger().info(f"shoud emit a string message to {dest} with argument {arg}")
-#            self._welcomeAvatar_out_message_publisher.publish(arg['text']) # tagged string
+            self.get_logger().info(f"shoud emit a string message to {dest} with argument {arg['text']}")
+            tagged_string = TaggedString()
+            tagged_string.header.stamp = self.get_clock().now().to_msg()
+            tagged_string.audio_sequence_number = self._seq_number
+            tagged_string.text.data = arg['text']
+            self._out_message_publisher[who].publish(tagged_string)
+            self._seq_number = self._seq_number + 1
         elif cmd == 'action':
             self.get_logger().info(f"shoud tell avatar at {dest} to conduct {arg}")
         else:
             self.get_logger().info(f"no idea what {cmd} is")
 
-        # and for fun, send out something
-        if self._loop:
-            asyncio.run_coroutine_threadsafe(
-                self._broadcast("hello nurse"),
-                self._loop
-            )
         
 
     def _stt_callback(self, msg):

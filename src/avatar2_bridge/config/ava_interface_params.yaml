@@ -3,7 +3,7 @@ welcomeAvatar/avatar/ava_bridge:
     port: 5678
     ipaddr: "127.0.0.1"
     debug: True
-    in_message: /welcomeAvatar/avatar/in_message
-    out_message: /welcomeAvatar/avatar/out_message
-    avatar_name: welcomeAvatar
-    out_command: /welcomeAvatar/avatar/out_command
+    avatar_names : [ "welcomeAvatar" ]
+    in_message: /avatar/in_message
+    out_message: /avatar/out_message
+    out_command: /avatar/out_command
