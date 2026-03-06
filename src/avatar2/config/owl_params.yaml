@@ -11,7 +11,7 @@ welcomeAvatar/avatar/sound_to_text:
     device: cuda
     message: /welcomeAvatar/avatar/in_message
     model: base
-    listen: /WelcomeAvatar/avatar/listen
+    listen: /welcomeAvatar/avatar/listen
     not_listen_timeout: 2.0
     debug: False
 welcomeAvatar/avatar/text_to_sound:
