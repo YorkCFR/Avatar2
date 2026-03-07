@@ -48,6 +48,7 @@ class Text2AudioNode(Node):
                 msg.text = String()
                 msg.text.data = data.text.data
                 msg.header.stamp = self.get_clock().now().to_msg()
+                msg.header.frame_id = ""
                 msg.seq = data.audio_sequence_number
                 self._publisher.publish(msg)
                 

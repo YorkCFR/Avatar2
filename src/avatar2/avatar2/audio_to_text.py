@@ -70,7 +70,7 @@ class Audio2TextNode(Node):
             self.get_logger().info(f"Listening to message sequence number {data.seq}")
 
 	    # timeout if _not_listening
-        if (not self._listening) and (self.get_clock().now().nanoseconds > (self._not_listening_time + self._not_listening_timeout)):
+        if (not self._listening) and (self.get_clock().now().nanoseconds > (self._not_listening_time + self._not_listen_timeout)):
             if self._debug:
                 self.get_logger().info(f"Not listening timeout. Going to start listening again (starting now)")
             self._listening = True

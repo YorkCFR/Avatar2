@@ -8,5 +8,6 @@ with connect(uri) as websocket:
         print("Waiting for something....")
         print(websocket.recv())
 
-        time.sleep(1)
+#        time.sleep(5)
+#        websocket.send('{"cmd" : "say", "dest": "welcomeAvatar", "args" : {"text":"this is the end, my friend"}}')
   

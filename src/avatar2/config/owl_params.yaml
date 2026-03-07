@@ -13,7 +13,7 @@ welcomeAvatar/avatar/sound_to_text:
     model: base
     listen: /welcomeAvatar/avatar/listen
     not_listen_timeout: 2.0
-    debug: False
+    debug: True
 welcomeAvatar/avatar/text_to_sound:
   ros__parameters:
     debug: True
