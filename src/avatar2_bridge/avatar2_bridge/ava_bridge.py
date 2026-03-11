@@ -63,6 +63,7 @@ class AvaBridgeNode(Node):
             if self._debug:
                 self.get_logger().info(f"creating callback for {topic}")
             self.create_subscription(TaggedString, topic, lambda msg: self._in_message_callback(msg, name), QoSProfile(depth=1))
+            self.create_subscription(TaggedString, "/" + name + "/avatar/avatar_status", lambda msg: self._in_message_callback(msg, name), QoSProfile(depth=1))
 
         self._out_command_publisher = [None] * len(self._avatar_names)
         self._out_message_publisher = [None] * len(self._avatar_names)
@@ -83,8 +84,8 @@ class AvaBridgeNode(Node):
             self.get_logger().info(f"got input text {msg} from {source}")
         
         package = '{"cmd" : "heard", "dest" : "' 
-        package = package + source + '", "arg :" '
-        package = package + '{"text" : "' + str(msg.text.data) + '"}}'
+        package = package + source + '", "arg" : '
+        package = package + '{"text" : ' + json.dumps(str(msg.text.data)) + '}}'
         if self._loop:
             asyncio.run_coroutine_threadsafe(
                 self._broadcast(package),
