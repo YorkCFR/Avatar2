@@ -38,7 +38,7 @@ class WebSocketClient:
                 # Wait for message from queue with timeout
                 message = await asyncio.wait_for(
                     self.send_queue.get(),
-                    timeout=1.0
+                    timeout=10.0
                 )
                 # Serialize and send the message
                 await self.websocket.send(json.dumps(message))

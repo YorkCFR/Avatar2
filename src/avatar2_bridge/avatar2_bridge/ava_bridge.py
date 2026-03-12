@@ -87,10 +87,13 @@ class AvaBridgeNode(Node):
         package = package + source + '", "arg" : '
         package = package + '{"text" : ' + json.dumps(str(msg.text.data)) + '}}'
         if self._loop:
+            self.get_logger().info(f"Forwarding message from ROS->WS")
             asyncio.run_coroutine_threadsafe(
                 self._broadcast(package),
                 self._loop
             )
+        else:
+            self.get_logger().info(f"unable to forward message from ROS->WS")
             
         
     def ProcessMessage(self, msg, websocket):
@@ -123,27 +126,6 @@ class AvaBridgeNode(Node):
             self.get_logger().info(f"shoud tell avatar at {dest} to conduct {arg}")
         else:
             self.get_logger().info(f"no idea what {cmd} is")
-
-        
-
-    def _stt_callback(self, msg):
-        """
-        Callback for STT transcribed speech
-        Packages it as JSON and forwards it to Unity Owl via via WebSocket
-        """
-        text = msg.text.data
-        self.get_logger().info(f"[HEARD]: {msg.text.data}")
-
-        payload = json.dumps({
-            "command": "say",
-            "argument": text
-        })
-
-        if self._loop:
-            asyncio.run_coroutine_threadsafe(
-                self._broadcast(payload), 
-                self._loop
-            )
 
     async def _broadcast(self, message):
         """
