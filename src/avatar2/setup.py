@@ -35,6 +35,7 @@ setup(
             'sound_play = avatar2.audio_input_wav:main',		# play a wav file (debug)
             'sound_dump = avatar2.audio_dump:main',			# dump audio file (debug)
             'sound_to_text = avatar2.audio_to_text:main',		# convert audio to text
+            'text_to_wav = avatar2.text_to_wav:main',			# convert audio to wav for local transmission
             'play_text = avatar2.play_text:main',			# convert text to wav
             'text_to_sound = avatar2.text_to_audio:main',               # convert text to sound
             'text_dump = avatar2.text_dump:main',                       # dump a tagged string to the log (debug)

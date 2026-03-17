@@ -1,39 +1,46 @@
 import websockets.sync.client
+import asyncio
 import time
 import json
 
-def get_packet(msg):
+async def say(websocket, s):
+    x = '{"cmd" : "say", "dest": "welcomeAvatar", "args" : {"text":"' + s + '"}}'
+    print(f"Sending {x}")
+#    websocket.send(x)
+
+
+async def get_packet(websocket):
     """This makes many gross assumptions to return one word"""
-    try:
-        print("Getting a packet")
-        parsed = json.loads(msg)
-        q = parsed["arg"]
-        z = str(q['text'])
-        pp = json.loads(z)
-        print(pp['description'])
-        return pp['description']
-    except:
-        return '??'
-  
-
-uri = "ws://localhost:5678"
-with websockets.sync.client.connect(uri) as websocket:
-    for i in range(10000):
-        print("Waiting for something....")
-        msg = websocket.recv()
-        q = get_packet(msg)
-        while q != 'idle':
-            print("Waiting for idle")
-            msg = websocket.recv()
-            q = get_packet(msg)
-        websocket.send('{"cmd" : "say", "dest": "guy1", "args" :{"text":"this is the end"}}')
-        while q != 'talking':
-            print(f"Waiting for talking {q}")
-            msg = websocket.recv()
-            q = get_packet(msg)
-        while q != 'idle':
-            print(f"Waiting for idle {q}")
-            msg = websocket.recv()
-            q = get_packet(msg)
+    print("Getting a packet")
+    msg = websocket.recv()
+    print(msg)
+    parsed = json.loads(msg)
+    q = parsed["arg"]
+    print(q)
+    z = str(q['text'])
+    print(z)
+    pp = json.loads(z)
+    print(json.dumps(z))
+    print(pp['cmd'])
+    print(pp['arg'])
+    return pp['arg']
 
 
+async def speaker(websocket):
+    while True:
+        print("Speaker")
+        await say(websocket, "Hello nurse")
+        await asyncio.sleep(10)
+        
+async def listener(websocket):
+    async for message in websocket:
+        print(f"Received {message}")
+
+async def tester():
+    print("tester")
+    uri = "ws://localhost:5678"
+    async with websockets.connect(uri) as websocket:
+        await asyncio.gather(speaker(websocket), listener(websocket))
+
+print("And away we go")
+asyncio.run(tester())

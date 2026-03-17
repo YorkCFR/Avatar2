@@ -13,11 +13,18 @@ welcomeAvatar/avatar/sound_to_text:
     model: base
     listen: /welcomeAvatar/avatar/listen
     not_listen_timeout: 2.0
-    debug: True
+    debug: False
 welcomeAvatar/avatar/text_to_sound:
   ros__parameters:
-    debug: True
+    debug: False
     audio: /welcomeAvatar/avatar/out_raw_audio
+    message: /welcomeAvatar/avatar/out_message
+    voice_model: /home/jenkin/Documents/avatar/Avatar2/tts_models/en_US-lessac-high.onnx
+welcomeAvatar/avatar/text_to_wav:
+  ros__parameters:
+    debug: False
+    audio_dir: /tmp/avatar
+    audio_raw: /welcomeAvatar/avatar/out_raw_audio
     message: /welcomeAvatar/avatar/out_message
     voice_model: /home/jenkin/Documents/avatar/Avatar2/tts_models/en_US-lessac-high.onnx
 welcomeAvatar/avatar/sentiment_analysis:

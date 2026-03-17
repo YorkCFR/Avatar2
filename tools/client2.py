@@ -9,10 +9,14 @@ def get_packet(webosocket):
     print(msg)
     parsed = json.loads(msg)
     q = parsed["arg"]
+    print(q)
     z = str(q['text'])
+    print(z)
     pp = json.loads(z)
-    print(pp['description'])
-    return pp['description']
+    print(json.dumps(z))
+    print(pp['cmd'])
+    print(pp['arg'])
+    return pp['arg']
   
 
 uri = "ws://localhost:5678"
