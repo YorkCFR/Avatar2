@@ -12,7 +12,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
     ros_ui = False
 
-    config = os.path.join(get_package_share_directory('avatar2'), 'config', 'owl_robotr_params.yaml')
+    config = os.path.join(get_package_share_directory('avatar2'), 'config', 'owl_robot_params.yaml')
     print(config)
     
     nodes = []
