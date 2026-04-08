@@ -1,0 +1,58 @@
+printerAvatar/avatar/sound_capture:
+  ros__parameters:
+    audio_port: 3
+    topic: /printerAvatar/avatar/in_raw_audio
+    non_speaking_duration: 1.0
+    pause_threshold: 1.0
+    debug: False
+printerAvatar/avatar/sound_to_text:
+  ros__parameters:
+    topic: /printerAvatar/avatar/in_raw_audio
+    device: cuda
+    message: /printerAvatar/avatar/in_message
+    model: base
+    listen: /printerAvatar/avatar/listen
+    not_listen_timeout: 2.0
+    debug: False
+printerAvatar/avatar/text_to_sound:
+  ros__parameters:
+    debug: False
+    audio: /printerAvatar/avatar/out_raw_audio
+    message: /printerAvatar/avatar/out_message
+    voice_model: /home/jenkin/Documents/avatar/Avatar2/tts_models/en_US-lessac-high.onnx
+printerAvatar/avatar/text_to_wav:
+  ros__parameters:
+    debug: False
+    audio_dir: /tmp/avatar
+    audio_raw: /printerAvatar/avatar/out_raw_audio
+    message: /printerAvatar/avatar/out_message
+    voice_model: /home/jenkin/Documents/avatar/Avatar2/tts_models/en_US-lessac-high.onnx
+printerAvatar/avatar/sentiment_analysis:
+  ros__parameters:
+    debug: True
+    topic: /printerAvatar/avatar/in_raw_audio
+    sentiment: /printerAvatar/avatar/sentiment_analysis
+    sentiments: ["anger", "excited", "neutral", "sad", "happy", "fear", "surprised"]
+    classification_model: /home/jenkin/Documents/avatar/Avatar2/src/avatar2/classification_model/model
+printerAvatar/avatar/avatar_camera:
+  ros__parameters:
+    debug: False
+    port: 0
+    topic: /printerAvatar/avatar/avatar_camera/image_raw
+printerAvatar/avatar/head_detect:
+  ros__parameters:
+    camera_topic: /printerAvatar/avatar/avatar_camera/image_raw
+    face_topic: /printerAvatar/avatar/faces
+    known_faces: /home/jenkin/Documents/avatar/Avatar2/scenarios/owl/faces
+    debug: False
+printerAvatar/avatar/user_tracker:
+  ros__parameters:
+    face_topic: /printerAvatar/avatar/faces
+    tracker_topic: /printerAvatar/avatar/users
+    conversation_timeout: 5.0
+    new_person_threshold: 1.0
+    intimate: 0.11
+    personal: 0.05
+    social: 0.02
+    debug: False
+    
