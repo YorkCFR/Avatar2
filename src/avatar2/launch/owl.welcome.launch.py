@@ -12,10 +12,64 @@ from launch_ros.actions import Node
 def generate_launch_description():
     ros_ui = False
 
-    config = os.path.join(get_package_share_directory('avatar2'), 'config', 'owl_params.yaml')
+    config = os.path.join(get_package_share_directory('avatar2'), 'config', 'owl_welcome_params.yaml')
     print(config)
     
     nodes = []
+    camera_node = Node(
+            package='avatar2',
+            executable='avatar_camera',
+            name='avatar_camera',
+            output='screen',
+            namespace = '/welcomeAvatar/avatar',
+            parameters=[config])
+    nodes.append(camera_node)
+
+    camera_view_node = Node(
+            package='avatar2',
+            executable='avatar_camera_view',
+            name='avatar_camera_view',
+            output='screen',
+            namespace = '/welcomeAvatar/avatar',
+            parameters=[config])
+#    nodes.append(camera_view_node)
+
+    face_recognizer_node = Node(
+            package='avatar2',
+            executable='head_detect',
+            name='head_detect',
+            output='screen',
+            namespace = '/welcomeAvatar/avatar',
+            parameters=[config])
+    nodes.append(face_recognizer_node)
+
+    face_recognizer_view_node = Node(
+            package='avatar2',
+            executable='view_head_info',
+            name='view_head_info',
+            output='screen',
+            namespace = '/welcomeAvatar/avatar',
+            parameters=[config])
+#    nodes.append(face_recognizer_view_node)
+    
+    user_tracker_node = Node(
+            package='avatar2',
+            executable='user_tracker',
+            name='user_tracker',
+            output='screen',
+            namespace = '/welcomeAvatar/avatar',
+            parameters=[config])
+    nodes.append(user_tracker_node)
+
+    user_monitor_node = Node(
+            package='avatar2',
+            executable='user_monitor',
+            name='user_monitor',
+            output='screen',
+            namespace = '/welcomeAvatar/avatar',
+            parameters=[config])
+    nodes.append(user_monitor_node)
+    
     microphone_node = Node(
              package='avatar2',
              executable='sound_capture',
@@ -34,33 +88,6 @@ def generate_launch_description():
              parameters=[config])
     nodes.append(sound_to_text_node)
 
-    camera_node = Node(
-            package='avatar2',
-            executable='avatar_camera',
-            name='avatar_camera',
-            output='screen',
-            namespace = '/welcomeAvatar/avatar',
-            parameters=[config])
-    nodes.append(camera_node)
-
-    sentiment_node = Node(
-            package='avatar2',
-            executable='sentiment_analysis',
-            name='analysis',
-            output='screen',
-            namespace = '/welcomeAvatar/avatar',
-            parameters=[config])
-#    nodes.append(sentiment_node)  # currently some issue with tensorRT on my home machine
-
-    text_to_sound = Node(
-            package='avatar2',
-            executable='text_to_sound',
-            name='text_to_sound',
-            output='screen',
-            namespace = '/welcomeAvatar/avatar',
-            parameters=[config])
-    nodes.append(text_to_sound)
-
     rosbridge_node = Node(
             package='rosbridge_server',
             executable='rosbridge_websocket',
@@ -69,31 +96,5 @@ def generate_launch_description():
             namespace="/welcomeAvatar/avatar")
     nodes.append(rosbridge_node)
 
-    face_recognizer_node = Node(
-            package='avatar2',
-            executable='head_detect',
-            name='head_detect',
-            output='screen',
-            namespace = '/welcomeAvatar/avatar',
-            parameters=[config])
-    nodes.append(face_recognizer_node)
-    
-    user_tracker_node = Node(
-            package='avatar2',
-            executable='user_tracker',
-            name='user_tracker',
-            output='screen',
-            namespace = '/welcomeAvatar/avatar',
-            parameters=[config])
-    nodes.append(user_tracker_node)
-
-#    if ros_ui:
-#        ros_node = Node(
-#             package='avatar2',
-#             executable='ros_avatar',
-#             name='ros_avatar',
-#             output='screen',
-#             parameters=[{'imagery': ui_imagery, 'debug': False}])
-#        nodes.append(ros_node)
 
     return LaunchDescription(nodes)

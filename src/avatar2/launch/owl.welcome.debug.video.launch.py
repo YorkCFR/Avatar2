@@ -12,7 +12,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
     ros_ui = False
 
-    config = os.path.join(get_package_share_directory('avatar2'), 'config', 'owl_robot_params.yaml')
+    config = os.path.join(get_package_share_directory('avatar2'), 'config', 'owl_welcome_params.yaml')
     print(config)
     
     nodes = []
@@ -21,7 +21,7 @@ def generate_launch_description():
             executable='avatar_camera',
             name='avatar_camera',
             output='screen',
-            namespace = '/robotAvatar/avatar',
+            namespace = '/welcomeAvatar/avatar',
             parameters=[config])
     nodes.append(camera_node)
 
@@ -30,7 +30,7 @@ def generate_launch_description():
             executable='avatar_camera_view',
             name='avatar_camera_view',
             output='screen',
-            namespace = '/robotAvatar/avatar',
+            namespace = '/welcomeAvatar/avatar',
             parameters=[config])
     nodes.append(camera_view_node)
 
@@ -39,7 +39,7 @@ def generate_launch_description():
             executable='head_detect',
             name='head_detect',
             output='screen',
-            namespace = '/robotAvatar/avatar',
+            namespace = '/welcomeAvatar/avatar',
             parameters=[config])
     nodes.append(face_recognizer_node)
 
@@ -48,7 +48,7 @@ def generate_launch_description():
             executable='view_head_info',
             name='view_head_info',
             output='screen',
-            namespace = '/robotAvatar/avatar',
+            namespace = '/welcomeAvatar/avatar',
             parameters=[config])
     nodes.append(face_recognizer_view_node)
     
@@ -57,7 +57,7 @@ def generate_launch_description():
             executable='user_tracker',
             name='user_tracker',
             output='screen',
-            namespace = '/robotAvatar/avatar',
+            namespace = '/welcomeAvatar/avatar',
             parameters=[config])
     nodes.append(user_tracker_node)
 
@@ -66,7 +66,7 @@ def generate_launch_description():
             executable='user_monitor',
             name='user_monitor',
             output='screen',
-            namespace = '/robotAvatar/avatar',
+            namespace = '/welcomeAvatar/avatar',
             parameters=[config])
     nodes.append(user_monitor_node)
     

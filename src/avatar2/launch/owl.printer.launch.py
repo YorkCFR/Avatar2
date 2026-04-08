@@ -32,7 +32,7 @@ def generate_launch_description():
             output='screen',
             namespace = '/printerAvatar/avatar',
             parameters=[config])
-    nodes.append(camera_view_node)
+#    nodes.append(camera_view_node)
 
     face_recognizer_node = Node(
             package='avatar2',
@@ -50,7 +50,7 @@ def generate_launch_description():
             output='screen',
             namespace = '/printerAvatar/avatar',
             parameters=[config])
-    nodes.append(face_recognizer_view_node)
+#    nodes.append(face_recognizer_view_node)
     
     user_tracker_node = Node(
             package='avatar2',
@@ -87,5 +87,14 @@ def generate_launch_description():
              namespace = '/printerAvatar/avatar',
              parameters=[config])
     nodes.append(sound_to_text_node)
+
+    rosbridge_node = Node(
+            package='rosbridge_server',
+            executable='rosbridge_websocket',
+            name='rosbridge_websocket',
+            output='screen',
+            namespace="/welcomeAvatar/avatar")
+    nodes.append(rosbridge_node)
+
 
     return LaunchDescription(nodes)

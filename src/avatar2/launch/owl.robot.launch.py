@@ -32,7 +32,7 @@ def generate_launch_description():
             output='screen',
             namespace = '/robotAvatar/avatar',
             parameters=[config])
-    nodes.append(camera_view_node)
+#    nodes.append(camera_view_node)
 
     face_recognizer_node = Node(
             package='avatar2',
@@ -50,7 +50,7 @@ def generate_launch_description():
             output='screen',
             namespace = '/robotAvatar/avatar',
             parameters=[config])
-    nodes.append(face_recognizer_view_node)
+#    nodes.append(face_recognizer_view_node)
     
     user_tracker_node = Node(
             package='avatar2',
