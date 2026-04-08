@@ -1,4 +1,5 @@
 numpy==1.26
+numba==0.61
 empy
 PyYAML
 catkin_pkg

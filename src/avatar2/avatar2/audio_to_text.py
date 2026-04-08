@@ -41,6 +41,10 @@ class Audio2TextNode(Node):
         self.declare_parameter('not_listen_timeout', 2.0) # in seconds
         self._not_listen_timeout = self.get_parameter('listen').get_parameter_value().double_value * 1e9 # convert to mano seconds
 
+        
+        if self._debug:
+            self.get_logger().info(f'Whisper starting with device {cuda}')
+
         self._model = whisper.load_model(model, device=cuda)
 
         self.create_subscription(Audio, topic, self._audio_callback, QoSProfile(depth=1))

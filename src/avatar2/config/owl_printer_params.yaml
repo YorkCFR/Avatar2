@@ -8,12 +8,12 @@ printerAvatar/avatar/sound_capture:
 printerAvatar/avatar/sound_to_text:
   ros__parameters:
     topic: /printerAvatar/avatar/in_raw_audio
-    device: cuda
+    device: cpu
     message: /printerAvatar/avatar/in_message
     model: base
     listen: /printerAvatar/avatar/listen
     not_listen_timeout: 2.0
-    debug: False
+    debug: True
 printerAvatar/avatar/text_to_sound:
   ros__parameters:
     debug: False
