@@ -25,6 +25,15 @@ def generate_launch_description():
             parameters=[config])
     nodes.append(camera_node)
 
+    camera_view_node = Node(
+            package='avatar2',
+            executable='avatar_camera_view',
+            name='avatar_camera_view',
+            output='screen',
+            namespace = '/printerAvatar/avatar',
+            parameters=[config])
+    nodes.append(camera_view_node)
+
     face_recognizer_node = Node(
             package='avatar2',
             executable='head_detect',
@@ -33,6 +42,15 @@ def generate_launch_description():
             namespace = '/printerAvatar/avatar',
             parameters=[config])
     nodes.append(face_recognizer_node)
+
+    face_recognizer_view_node = Node(
+            package='avatar2',
+            executable='view_head_info',
+            name='view_head_info',
+            output='screen',
+            namespace = '/printerAvatar/avatar',
+            parameters=[config])
+    nodes.append(face_recognizer_view_node)
     
     user_tracker_node = Node(
             package='avatar2',
@@ -43,4 +61,13 @@ def generate_launch_description():
             parameters=[config])
     nodes.append(user_tracker_node)
 
+    user_monitor_node = Node(
+            package='avatar2',
+            executable='user_monitor',
+            name='user_monitor',
+            output='screen',
+            namespace = '/printerAvatar/avatar',
+            parameters=[config])
+    nodes.append(user_monitor_node)
+    
     return LaunchDescription(nodes)

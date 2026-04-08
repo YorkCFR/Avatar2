@@ -10,7 +10,11 @@ class UserMonitorNode(Node):
         super().__init__("user_monitor_node")
         self.get_logger().info(f'{self.get_name()} created')
 
-        self._subscriber = self.create_subscription(TaggedString, "/avatar2/user_info", self._callback, QoSProfile(depth=1))
+        self.declare_parameter('tracker_topic', '/avatar2/tracker_topic')
+        tracker_topic = self.get_parameter('tracker_topic').get_parameter_value().string_value
+
+
+        self._subscriber = self.create_subscription(TaggedString, tracker_topic, self._callback, QoSProfile(depth=1))
 
         self._state = "Startup"
         self._nlooking = 0
@@ -22,7 +26,7 @@ class UserMonitorNode(Node):
 
         if self._state == "Startup":
             if j['state'] == "Looking":
-                self.get_logger().info(f"{self.get_name()} started up looking at {j['first_name']} {j['last_name']} duration {j['time']} {j['proxemics']}")
+                self.get_logger().info(f"started up looking at {j['first_name']} {j['last_name']} duration {j['time']} {j['proxemics']}")
                 self._watching = j
                 self._state = "Continuing"
             elif j['state'] == "Idle":

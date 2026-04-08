@@ -8,7 +8,7 @@ printerAvatar/avatar/sound_capture:
 printerAvatar/avatar/sound_to_text:
   ros__parameters:
     topic: /printerAvatar/avatar/in_raw_audio
-    device: cuda
+    device: cpu
     message: /printerAvatar/avatar/in_message
     model: base
     listen: /printerAvatar/avatar/listen
@@ -52,10 +52,6 @@ printerAvatar/avatar/head_detect:
 printerAvatar/avatar/view_head_info:
   ros__parameters:
     face: /printerAvatar/avatar/faces
-    debug: True
-printerAvatar/avatar/user_monitor:
-  ros__parameters:
-    tracker_topic: /printerAvatar/avatar/users
     debug: True
 printerAvatar/avatar/user_tracker:
   ros__parameters:
