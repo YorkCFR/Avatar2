@@ -3,6 +3,7 @@ build/
 install/
 datasets/*
 __pycache__/
+.venv
 *.gguf
 *.bin
 *.pkl

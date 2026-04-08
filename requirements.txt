@@ -1,0 +1,14 @@
+numpy==1.26
+empy
+PyYAML
+catkin_pkg
+lark
+tornado
+openai-whisper
+SpeechRecognition
+sounddevice
+pyaudio
+pymongo
+pillow
+cbor2
+face-recognition
