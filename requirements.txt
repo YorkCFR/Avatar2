@@ -12,3 +12,4 @@ pymongo
 pillow
 cbor2
 face-recognition
+pydub
