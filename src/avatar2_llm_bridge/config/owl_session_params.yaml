@@ -1,0 +1,13 @@
+avatar2_llm_bridge:
+  ros__parameters:
+    stations_json: '[{"avatar_name": "welcomeAvatar", "host": "127.0.0.1", "port": 5678}, {"avatar_name": "clockAvatar", "host": "127.0.0.1", "port": 5679}, {"avatar_name": "printerAvatar", "host": "127.0.0.1", "port": 5680}]'
+    session_enabled: True
+    session_route: ["welcomeAvatar", "clockAvatar", "printerAvatar"]
+    session_leave_line: "Follow me, I will take you to the 3D printer."
+    session_arrive_line: "Here we are. This is the 3D printer. What would you like to know?"
+    session_goodbye_line: "I am flying back to the entrance now. Goodbye."
+    session_guide_instruction: "If the person asks you to take them to the 3D printer, or to show or guide them there, reply with only [GUIDE] and nothing else."
+    session_waypoint_dwell: 8.0
+    session_idle_timeout: 60.0
+    session_step_timeout: 20.0
+    session_speech_start_timeout: 5.0
