@@ -22,7 +22,6 @@ setup(
     maintainer_email='walleed@yorku.ca',
     description='A ROS-based avatar for HRI',
     license='MIT license',
-    tests_require=['pytest'],
     entry_points={
         'console_scripts': [
             'avatar_camera = avatar2.opencv_camera:main',               # capture video

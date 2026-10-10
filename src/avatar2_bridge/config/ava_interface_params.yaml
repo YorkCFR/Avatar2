@@ -7,3 +7,4 @@ welcomeAvatar/avatar/ava_bridge:
     in_message: /avatar/in_message
     out_message: /avatar/out_message
     out_command: /avatar/out_command
+    status_cmd: status
