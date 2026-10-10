@@ -1,0 +1,10 @@
+clockAvatar/avatar/ava_bridge:
+  ros__parameters:
+    port: 5679
+    ipaddr: "127.0.0.1"
+    debug: True
+    avatar_names : [ "clockAvatar" ]
+    in_message: /avatar/in_message
+    out_message: /avatar/out_message
+    out_command: /avatar/out_command
+    status_cmd: status
