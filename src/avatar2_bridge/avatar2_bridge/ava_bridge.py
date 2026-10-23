@@ -20,11 +20,10 @@ from avatar2_interfaces.msg import TaggedString
 #          
 #       Suppored from ros message (cmd)
 #           heard - arg has at least the entry text whose value is what the llm heard
+#           status - arg has at least the entry text whose value is the avatar's status (only when status_cmd is set to status)
 #
 
-
 class AvaBridgeNode(Node):
-
     def __init__(self, ws_queue):
         super().__init__('ava_bridge')
         self.get_logger().info(f"{self.get_name()} node created.")
@@ -32,6 +31,7 @@ class AvaBridgeNode(Node):
         self._connected_clients = set()
         self._loop = None
         self._seq_number = 0
+        self._command_seq_number = 0
         
         self.declare_parameter('debug', True)
         self._debug = self.get_parameter('debug').get_parameter_value().bool_value
@@ -54,16 +54,19 @@ class AvaBridgeNode(Node):
         self.declare_parameter('out_command', '/avatar/out_command')
         self._out_command = self.get_parameter('out_command').get_parameter_value().string_value
 
+        self.declare_parameter('status_cmd', 'heard')
+        self._status_cmd = self.get_parameter('status_cmd').get_parameter_value().string_value
+
         if self._debug:
             self.get_logger().info(f"ipaddr {self._ipaddr} port {self._port}")
-            self.get_logger().info(f"avatar_names {self._avatar_names} in_topic {self._in_topic} out_topic {self._out_topic} out_command {self._out_command}")
+            self.get_logger().info(f"avatar_names {self._avatar_names} in_topic {self._in_topic} out_topic {self._out_topic} out_command {self._out_command} status_cmd {self._status_cmd}")
 
         for name in self._avatar_names:
             topic = "/" + name + self._in_topic
             if self._debug:
                 self.get_logger().info(f"creating callback for {topic}")
             self.create_subscription(TaggedString, topic, lambda msg: self._in_message_callback(msg, name), QoSProfile(depth=1))
-            self.create_subscription(TaggedString, "/" + name + "/avatar/avatar_status", lambda msg: self._in_message_callback(msg, name), QoSProfile(depth=1))
+            self.create_subscription(TaggedString, "/" + name + "/avatar/avatar_status", lambda msg: self._in_message_callback(msg, name, self._status_cmd), QoSProfile(depth=1))
 
         self._out_command_publisher = [None] * len(self._avatar_names)
         self._out_message_publisher = [None] * len(self._avatar_names)
@@ -78,12 +81,12 @@ class AvaBridgeNode(Node):
             self._out_command_publisher[idx]  = self.create_publisher(TaggedString, topic, QoSProfile(depth=1))
             topic = name + self._out_command
 
-    def _in_message_callback(self, msg, source):
+    def _in_message_callback(self, msg, source, cmd='heard'):
         """ Process any of the text inputs"""
         if self._debug:
             self.get_logger().info(f"got input text {msg} from {source}")
         
-        package = '{"cmd" : "heard", "dest" : "' 
+        package = '{"cmd" : "' + cmd + '", "dest" : "' 
         package = package + source + '", "arg" : '
         package = package + '{"text" : ' + json.dumps(str(msg.text.data)) + '}}'
         if self._loop:
@@ -94,7 +97,6 @@ class AvaBridgeNode(Node):
             )
         else:
             self.get_logger().info(f"unable to forward message from ROS->WS")
-            
         
     def ProcessMessage(self, msg, websocket):
         """ Process a message from the outsde world """
@@ -124,6 +126,15 @@ class AvaBridgeNode(Node):
             self._seq_number = self._seq_number + 1
         elif cmd == 'action':
             self.get_logger().info(f"shoud tell avatar at {dest} to conduct {arg}")
+            if not isinstance(arg, dict) or not isinstance(arg.get('act'), str):
+                self.get_logger().info(f"action for {dest} has no act, ignoring {arg}")
+                return
+            tagged_string = TaggedString()
+            tagged_string.header.stamp = self.get_clock().now().to_msg()
+            tagged_string.audio_sequence_number = self._command_seq_number
+            tagged_string.text.data = json.dumps(arg)
+            self._out_command_publisher[who].publish(tagged_string)
+            self._command_seq_number = self._command_seq_number + 1
         else:
             self.get_logger().info(f"no idea what {cmd} is")
 
@@ -192,6 +203,19 @@ def run_websocket_server(nows_queue, node, loop, ipaddr, port):
             await asyncio.Future()  # run forever
 
     loop.run_until_complete(serve())
+    
+async def _shutdown_ws_server(loop):
+    """Cancel every other task on this loop (the serve() task itself,
+    plus each client's handler/keepalive tasks) and let them unwind -
+    this lets websockets.serve()'s own __aexit__ close the server and
+    connections properly, instead of the loop being yanked out from
+    under run_until_complete(serve())."""
+    current = asyncio.current_task(loop)
+    tasks = [t for t in asyncio.all_tasks(loop) if t is not current]
+    for t in tasks:
+        t.cancel()
+    await asyncio.gather(*tasks, return_exceptions=True)
+    loop.stop()
 
 def main(args=None):
     rclpy.init(args=args)
@@ -214,9 +238,17 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
-        ws_thread.stop()
+        shutdown_future = asyncio.run_coroutine_threadsafe(_shutdown_ws_server(ws_loop), ws_loop)
+        try:
+            shutdown_future.result(timeout=5)
+        except Exception as e:
+            pass
+        ws_thread.join(timeout=2)
         node.destroy_node()
-        rclpy.shutdown()
+        try:
+            rclpy.shutdown()
+        except Exception as e:
+            pass
 
 if __name__ == '__main__':
     main()

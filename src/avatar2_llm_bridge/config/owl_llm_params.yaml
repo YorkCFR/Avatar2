@@ -1,0 +1,20 @@
+avatar2_llm_bridge:
+  ros__parameters:
+    # one entry per station's ava_bridge, written as a JSON list
+    # '[{"avatar_name": "welcomeAvatar", "host": "192.168.0.114", "port": 5678}]'
+    # '[{"avatar_name": "robotAvatar", "host": "192.168.0.114", "port": 5678}]'
+    stations_json: '[{"avatar_name": "printerAvatar", "host": "192.168.0.114", "port": 5678}]'
+    chat_model_path: "/home/walleed/Documents/Avatar2/llms/Qwen3.6-35B-A3B-UD-Q8_K_XL.gguf"
+    n_ctx: 4096
+    n_gpu_layers: -1
+    enable_thinking: False
+    max_tokens: 512
+    temperature: 0.7
+    top_p: 0.8
+    sampling_top_k: 20
+    min_p: 0.0
+    presence_penalty: 1.5
+    repeat_penalty: 1.0
+    system_prompt: "You are a friendly owl avatar. Answer briefly and warmly. Respond in plain text only - never use emojis, emoticons, or include images."
+    vectorstore_file: "/home/walleed/Documents/Avatar2/scenarios/library_main/library.pkl"
+    retrieval_k: 3

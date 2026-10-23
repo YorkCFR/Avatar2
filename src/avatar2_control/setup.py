@@ -19,7 +19,6 @@ setup(
     maintainer_email='jenkin@yorku.ca',
     description='High level avatar control',
     license='TODO: License declaration',
-    tests_require=['pytest'],
     entry_points={
         'console_scripts': [
             'basic_control = avatar2_control.basic_control:main',
